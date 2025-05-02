@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleReopenTab(url) {
         try {
+            await removeTabFromSaved(url); // Remove from saved list before reopening to avoid losing focus during async
             await chrome.tabs.create({ url: url, active: true });
-            await removeTabFromSaved(url);
             refreshLists(); // Update UI
         } catch (error) {
             console.error(`Failed to reopen tab for URL ${url}:`, error);
