@@ -1,0 +1,131 @@
+body {
+    width: 450px; /* Increased width a bit */
+    min-height: 100px;
+    max-height: 500px; /* Limit height to prevent huge popups */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    padding: 10px;
+    margin: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h2 {
+    font-size: 1.1em;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+    color: #111;
+}
+
+h2:first-of-type {
+    margin-top: 0;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    max-height: 200px; /* Scroll within sections */
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    background-color: #fff;
+}
+
+li {
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    line-height: 1.4;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+li:hover {
+    background-color: #f5f5f5;
+}
+
+.tab-info {
+    flex-grow: 1;
+    margin: 0 10px; /* Margin left/right */
+    overflow: hidden; /* Prevent long text from breaking layout */
+}
+
+.tab-title {
+    font-weight: 500;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #222;
+}
+
+.tab-url {
+    color: #666;
+    font-size: 0.85em;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+button {
+    padding: 4px 9px;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 0.9em;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    white-space: nowrap; /* Prevent button text wrapping */
+    flex-shrink: 0; /* Prevent buttons shrinking */
+}
+
+button:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+button:active {
+     background-color: #d0d0d0;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    flex-shrink: 0; /* Prevent icon shrinking */
+}
+
+#no-duplicates-msg,
+#no-saved-tabs-msg {
+    padding: 10px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.group-title {
+    font-weight: bold;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: #e9e9e9;
+    font-size: 0.9em;
+    color: #444;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd; /* Add top border too */
+}
+.group-title:first-child {
+    margin-top: 0;
+    border-top: none;
+}

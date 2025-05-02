@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tab Options</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        /* Basic inline styles for structure if popup.css isn't created yet */
+        body { width: 400px; font-family: sans-serif; padding: 10px; }
+        h2 { margin-top: 15px; margin-bottom: 5px; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
+        h2:first-of-type { margin-top: 0; }
+        ul { list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; }
+        li { padding: 5px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
+        li:last-child { border-bottom: none; }
+        .tab-info { flex-grow: 1; margin-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tab-title { font-weight: bold; display: block; }
+        .tab-url { color: #555; font-size: 0.9em; display: block; }
+        button { padding: 3px 8px; cursor: pointer; margin-left: 5px; }
+        .icon { width: 16px; height: 16px; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+        .group-title { font-weight: bold; margin-top: 10px; padding: 5px; background-color: #f0f0f0;}
+    </style>
+</head>
+<body>
+    <h2>Duplicate Tabs</h2>
+    <div id="duplicate-section">
+        <p id="no-duplicates-msg" style="display: none;">No duplicate tabs found.</p>
+        <ul id="duplicate-tabs-list">
+            <!-- Duplicate tabs will be listed here -->
+        </ul>
+    </div>
+
+    <h2>All Open Tabs</h2>
+    <ul id="all-tabs-list">
+        <!-- All tabs will be listed here -->
+    </ul>
+
+    <h2>Saved Tabs (Reopen Later)</h2>
+    <div id="saved-section">
+         <p id="no-saved-tabs-msg" style="display: none;">No tabs saved for later.</p>
+        <ul id="saved-tabs-list">
+            <!-- Saved tabs will be listed here -->
+        </ul>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
