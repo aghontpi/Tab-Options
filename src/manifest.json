@@ -6,8 +6,7 @@
     "permissions": [
       "tabs",      
       "scripting",
-      "storage",
-      "action" 
+      "storage"
     ],
     "host_permissions": [
       "<all_urls>" 
@@ -27,5 +26,14 @@
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
+    },
+    "web_accessible_resources": [
+    {
+      "resources": [
+        "content_script.js",
+        "style.css"
+       ],
+      "matches": ["<all_urls>"]
     }
+  ]
   }

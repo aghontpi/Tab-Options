@@ -1,0 +1,21 @@
+{
+  "name": "Tab-Operations",
+  "version": "1.2.0",
+  "description": "Asks before closing duplicate tabs and focuses the existing one. Redirects back on navigation duplicates if kept.",
+  "scripts": {
+    "start": "parcel watch src/manifest.json --host localhost --config @parcel/config-webextension --dist-dir dev-build --no-cache",
+    "build": "parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist --no-cache --no-source-maps"
+  },
+  "keywords": [
+    "tabs",
+    "chrome-extension",
+    "duplicates"
+  ],
+  "author": "iambluepie@gmail.com",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@parcel/config-webextension": "^2.14.4",
+    "parcel": "^2.14.4"
+  }
+}
