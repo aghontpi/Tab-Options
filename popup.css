@@ -1,3 +1,56 @@
+.group-header {
+    display: flex;             /* Use flexbox for layout */
+    justify-content: space-between; /* Push text and button apart */
+    align-items: center;       /* Vertically align items */
+    font-weight: bold;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: #e9e9e9;
+    font-size: 0.9em;
+    color: #444;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+}
+.group-header:first-child {
+    margin-top: 0;
+    border-top: none;
+}
+
+.group-url {
+    /* Allow text to take available space */
+    flex-grow: 1;
+    /* Prevent extremely long URLs from overflowing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px; /* Space before the button */
+}
+
+.close-all-duplicates-button {
+    /* Inherits general button styles */
+    flex-shrink: 0;        /* Prevent button from shrinking */
+    background-color: #e74c3c; /* Reddish color for destructive action */
+    color: white;
+    border-color: #c0392b;
+    font-size: 0.85em;     /* Slightly smaller */
+    padding: 3px 7px;
+    margin-left: 5px;      /* Ensure some space if text is short */
+}
+
+.close-all-duplicates-button:hover {
+    background-color: #c0392b;
+    border-color: #a93226;
+}
+
+.close-all-duplicates-button:active {
+     background-color: #a93226;
+}
+
+/* Optional: Add a bit more space below the header before the list items */
+.group-header + li {
+    margin-top: 3px;
+}
+
 body {
     width: 450px; /* Increased width a bit */
     min-height: 100px;

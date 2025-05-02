@@ -84,38 +84,68 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tabs = await chrome.tabs.query({});
             const savedTabs = await getSavedTabs();
             const urlMap = new Map();
-
-            // Populate All Tabs list and build URL map
+    
+            // Populate All Tabs list and build URL map (KEEP THIS PART AS IS)
             tabs.forEach(tab => {
-                // Ignore special URLs
                 if (!tab.url || (!tab.url.startsWith('http:') && !tab.url.startsWith('https:'))) {
                    return;
                 }
-
-                // Add to All Tabs list
                 allTabsList.appendChild(createTabListItem(tab, [
                     { text: 'Save & Close', onClick: () => handleSaveAndClose(tab.id) },
                     { text: 'Close', onClick: () => handleCloseTab(tab.id) }
                 ]));
-
-                // Add to URL map for duplicate detection
                 if (!urlMap.has(tab.url)) {
                     urlMap.set(tab.url, []);
                 }
                 urlMap.get(tab.url).push(tab);
             });
-
-            // Populate Duplicate Tabs list
+    
+            // Populate Duplicate Tabs list (MODIFY THIS PART)
             let duplicateCount = 0;
             urlMap.forEach((tabsWithSameUrl, url) => {
                 if (tabsWithSameUrl.length > 1) {
                     duplicateCount++;
-                    // Add a group title for clarity
-                    const groupTitle = document.createElement('div');
-                    groupTitle.classList.add('group-title');
-                    groupTitle.textContent = `Duplicates of: ${url}`;
-                    duplicateTabsList.appendChild(groupTitle);
-
+    
+                    // --- Create Group Header ---
+                    const groupHeader = document.createElement('div');
+                    groupHeader.classList.add('group-header'); // Use this class for styling
+    
+                    // Create span for the URL text
+                    const groupUrlSpan = document.createElement('span');
+                    groupUrlSpan.classList.add('group-url');
+                    groupUrlSpan.textContent = `Duplicates of: ${url}`;
+                    groupUrlSpan.title = url; // Show full URL on hover
+    
+                    // Create "Close All These" button
+                    const closeAllButton = document.createElement('button');
+                    closeAllButton.textContent = 'Close All Duplicates';
+                    closeAllButton.classList.add('close-all-duplicates-button'); // Class for styling/targeting
+                    closeAllButton.title = `Close all ${tabsWithSameUrl.length -1 } tabs with URL: ${url}`;
+    
+                    // Add click listener to the "Close All These" button
+                    closeAllButton.addEventListener('click', async () => {
+                        const tabIdsToClose = tabsWithSameUrl.filter((_, index) => index !== 0).map(tab => tab.id)
+                        console.log(`Closing duplicate tabs with IDs: ${tabIdsToClose.join(', ')} for URL: ${url}`);
+                        try {
+                            await chrome.tabs.remove(tabIdsToClose);
+                            refreshLists(); // Refresh the entire popup view
+                        } catch (error) {
+                            console.error("Error closing duplicate tabs:", error);
+                            // Might happen if some tabs were closed manually
+                            refreshLists(); // Refresh anyway to show current state
+                        }
+                    });
+    
+                    // Append text and button to the header
+                    groupHeader.appendChild(groupUrlSpan);
+                    groupHeader.appendChild(closeAllButton);
+    
+                    // Append the header to the main duplicate list
+                    duplicateTabsList.appendChild(groupHeader);
+                    // --- End Group Header ---
+    
+    
+                    // Append individual duplicate tab items (KEEP THIS PART AS IS)
                     tabsWithSameUrl.forEach(dupTab => {
                         duplicateTabsList.appendChild(createTabListItem(dupTab, [
                             { text: 'Close', onClick: () => handleCloseTab(dupTab.id) }
@@ -123,13 +153,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 }
             });
-
-             // Show 'no duplicates' message if needed
-             if (duplicateCount === 0) {
+    
+            // Show 'no duplicates' message if needed (KEEP THIS PART AS IS)
+            if (duplicateCount === 0) {
                 noDuplicatesMsg.style.display = 'block';
-             }
-
-            // Populate Saved Tabs list
+            }
+    
+            // Populate Saved Tabs list (KEEP THIS PART AS IS)
             if (savedTabs.length === 0) {
                  noSavedTabsMsg.style.display = 'block';
             } else {
@@ -140,12 +170,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ]));
                 });
             }
-
+    
         } catch (error) {
             console.error("Error refreshing lists:", error);
             // Display an error message in the popup?
         }
     }
+ 
 
     // --- Event Handlers ---
 
