@@ -17,7 +17,8 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
   }
 
   try {
-    const duplicateTabs = await chrome.tabs.query({ url: url });
+    const cleanUrl = url.includes("mail.google.com") && url.includes("#") ? url.split('#')[0] : url; // Removes the fragment
+    const duplicateTabs = await chrome.tabs.query({ url: cleanUrl });
     const existingTab = duplicateTabs.find(t => t.id !== tabId);
 
     if (existingTab) {
