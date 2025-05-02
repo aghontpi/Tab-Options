@@ -1,5 +1,7 @@
 // Store tabs that are currently showing a confirmation prompt
 const promptingTabs = new Set();
+// Track newly created tabs so we can tell their first load apart from in‑tab navigations
+const newlyCreatedTabs = new Set();
 
 // Function to check for duplicates and initiate confirmation
 async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
@@ -74,6 +76,8 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
 
 // Listener for new tab creation
 chrome.tabs.onCreated.addListener((tab) => {
+  // Mark this tab as freshly created
+  newlyCreatedTabs.add(tab.id);
   // Use onUpdated 'complete' status or a delay, as URL might not be ready
   // Let's rely on onUpdated mostly, but keep a simple check here too
   if (tab.pendingUrl && (tab.pendingUrl.startsWith('http:') || tab.pendingUrl.startsWith('https:'))) {
@@ -101,7 +105,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       // Use the latest URL from the 'tab' object if available and complete, otherwise use changeInfo.url
       const checkUrl = (changeInfo.status === 'complete' && tab.url) ? tab.url : changeInfo.url;
       if (checkUrl) {
-        checkForDuplicateAndConfirm(tabId, checkUrl, true); // Mark as navigation
+        const isNavigation = !newlyCreatedTabs.has(tabId);   // true only for real in‑tab navigations
+        newlyCreatedTabs.delete(tabId);                      // first load seen, no longer "new"
+        checkForDuplicateAndConfirm(tabId, checkUrl, isNavigation);
       }
   }
 });
@@ -118,11 +124,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.action === "mergeTabs") {
     console.log(`User chose MERGE for Tab ${tabId}. Focusing ${message.existingTabId} and closing ${tabId}`);
-    chrome.tabs.update(message.existingTabId, { active: true })
-      .then(() => chrome.windows.update(message.windowId, { focused: true })) // Ensure window has focus
-      .then(() => chrome.tabs.remove(tabId))
-      .catch(error => console.error(`Error during merge action: ${error}`));
-    sendResponse({ status: "merge initiated" });
+
+    (async () => {
+      try {
+        // Activate the existing duplicate tab
+        await chrome.tabs.update(message.existingTabId, { active: true });
+
+        // Focus the window that contains the existing tab
+        const winId = await getWindowIdForTab(message.existingTabId);
+        if (winId !== null) {
+          await chrome.windows.update(winId, { focused: true });
+        }
+
+        // Close the now‑redundant duplicate tab
+        await chrome.tabs.remove(tabId);
+
+        // Confirm success back to the content script
+        sendResponse({ status: "merge complete" });
+      } catch (err) {
+        console.error(`Error during merge action: ${err}`);
+        sendResponse({ status: "merge failed", error: err.message });
+      }
+    })();
+
+    // Keep the message port open for the async sendResponse above
+    return true;
 
   } else if (message.action === "keepTab") {
     console.log(`User chose KEEP for Tab ${tabId}`);
@@ -145,7 +171,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
          }).catch(err => console.error(`Failed to execute history.back() script in tab ${tabId}: ${err}`));
     }
      // Signal back that the choice was processed
-     sendResponse({ status: "keep initiated" });
+     sendResponse({ status: "keep completed" });
 
   } else if (message.action === "promptClosed") {
       // User closed the prompt without making a choice (e.g., via an X button)
@@ -170,6 +196,7 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
   if (promptingTabs.has(tabId)) {
     console.log(`Tab ${tabId} closed while prompting.`);
     promptingTabs.delete(tabId);
+    newlyCreatedTabs.delete(tabId); // Clean up the tracking set
   }
 });
 
