@@ -43,6 +43,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             listItem.appendChild(button);
         });
 
+        listItem.addEventListener('click', async (e) => {
+            if (e.target.tagName.toLowerCase() === 'button') return;
+            const tabId = parseInt(listItem.dataset.tabId);
+            if (!isNaN(tabId)) {
+                try {
+                    const { windowId } = await chrome.tabs.update(tabId, { active: true });
+                    await chrome.windows.update(windowId, { focused: true });
+                    console.log(`Tab ${tabId} activated. Focusing window ${windowId}...`);
+                } catch (err) {
+                    console.error("Failed to activate tab/window:", err);
+                }
+            }
+        });
+
         return listItem;
     }
 
