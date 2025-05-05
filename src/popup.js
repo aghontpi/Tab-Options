@@ -100,8 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const urlMap = new Map();
     
             // Populate All Tabs list and build URL map (KEEP THIS PART AS IS)
+            // Consider all web pages except blank new tabs 
             tabs.forEach(tab => {
-                if (!tab.url || (!tab.url.startsWith('http:') && !tab.url.startsWith('https:'))) {
+                if (!tab.url || tab.url.startsWith('chrome://new')) {
                    return;
                 }
                 allTabsList.appendChild(createTabListItem(tab, [
@@ -208,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleSaveAndClose(tabId) {
         try {
             const tab = await chrome.tabs.get(tabId);
-            if (tab && tab.url && (tab.url.startsWith('http:') || tab.url.startsWith('https:'))) {
+            if (tab && tab.url && !tab.url.startsWith('chrome://new')) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
                 await chrome.tabs.remove(tabId);
                 refreshLists(); // Update UI
