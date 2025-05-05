@@ -12,8 +12,8 @@ async function updateDuplicateCountBadge() {
 
       // Filter and group tabs by URL
       tabs.forEach(tab => {
-          // Only consider standard web pages we can access
-          if (tab.url && (tab.url.startsWith('http:') || tab.url.startsWith('https:'))) {
+          // Cconsider all web pages except new tab pages
+          if (tab.url && !(tab.url.startsWith('chrome://new-tab') || tab.url.startsWith('chrome://newtab'))) {
               const count = urlMap.get(tab.url) || 0;
               urlMap.set(tab.url, count + 1);
           }
@@ -56,8 +56,8 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
       return;
   }
 
-  // Only check standard web pages
-  if (!url || !(url.startsWith('http:') || url.startsWith('https:'))) {
+  // Cconsider all web pages except new tab pages
+  if (!url || url.startsWith('chrome://new-tab') || url.startsWith('chrome://newtab')) {
       updateDuplicateCountBadge(); // Still update badge even if not checking this specific tab
       return;
   }
@@ -142,7 +142,7 @@ chrome.tabs.onCreated.addListener((tab) => {
   newlyCreatedTabs.add(tab.id);
   // Use onUpdated 'complete' status or a delay, as URL might not be ready
   // Let's rely on onUpdated mostly, but keep a simple check here too
-  if (tab.pendingUrl && (tab.pendingUrl.startsWith('http:') || tab.pendingUrl.startsWith('https:'))) {
+  if (tab.pendingUrl && !(tab.pendingUrl.startsWith('chrome://new-tab') || tab.pendingUrl.startsWith('chrome://newtab'))) {
       // Small delay as URL might change quickly
       setTimeout(async () => {
           try {
@@ -173,13 +173,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // Also check if status changes to 'loading' which often precedes a URL change
   const urlChanged = changeInfo.url;
   const loadingStarted = changeInfo.status === 'loading';
-  const loadCompleted = changeInfo.status === 'complete' && tab.url && (tab.url.startsWith('http:') || tab.url.startsWith('https:'));
+  const loadCompleted = changeInfo.status === 'complete' && tab.url && !(tab.url.startsWith('chrome://new-tab') || tab.url.startsWith('chrome://newtab'));
 
   if (urlChanged || loadingStarted || loadCompleted) {
      console.log(`Tab updated: ${tabId}, changeInfo:`, changeInfo);
       // Use the latest URL from the 'tab' object if available and complete, otherwise use changeInfo.url
       const checkUrl = (loadCompleted && tab.url) ? tab.url : changeInfo.url; // Prioritize definite URL
-      if (checkUrl && (checkUrl.startsWith('http:') || checkUrl.startsWith('https:'))) {
+      if (checkUrl && !(checkUrl.startsWith('chrome://new-tab') || checkUrl.startsWith('chrome://newtab'))) {
           const isNavigation = !newlyCreatedTabs.has(tabId); // true only for real in‑tab navigations
           if (loadCompleted) { // Only remove from newlyCreatedTabs once loaded, not just on 'loading' or url change
               newlyCreatedTabs.delete(tabId); // first load seen, no longer "new"
