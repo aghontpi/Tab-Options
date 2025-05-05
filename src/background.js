@@ -12,7 +12,7 @@ async function updateDuplicateCountBadge() {
 
       // Filter and group tabs by URL
       tabs.forEach(tab => {
-          // Cconsider all web pages except new tab pages
+          // Consider all web pages except new tab pages
           if (tab.url && !(tab.url.startsWith('chrome://new-tab') || tab.url.startsWith('chrome://newtab'))) {
               const count = urlMap.get(tab.url) || 0;
               urlMap.set(tab.url, count + 1);
@@ -56,7 +56,7 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
       return;
   }
 
-  // Cconsider all web pages except new tab pages
+  // Consider all web pages except new tab pages
   if (!url || url.startsWith('chrome://new-tab') || url.startsWith('chrome://newtab')) {
       updateDuplicateCountBadge(); // Still update badge even if not checking this specific tab
       return;

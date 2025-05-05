@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const urlMap = new Map();
     
             // Populate All Tabs list and build URL map (KEEP THIS PART AS IS)
-            // Cconsider all web pages except new tab pages
+            // Consider all web pages except new tab pages
             tabs.forEach(tab => {
                 if (!tab.url || tab.url.startsWith('chrome://new-tab') || tab.url.startsWith('chrome://newtab')) {
                    return;
