@@ -12,8 +12,8 @@ async function updateDuplicateCountBadge() {
 
       // Filter and group tabs by URL
       tabs.forEach(tab => {
-          // Consider all web pages except blank new tabs 
-          if (tab.url && !tab.url.startsWith('chrome://new')) {
+          // Consider all web pages
+          if (tab.url) {
               const count = urlMap.get(tab.url) || 0;
               urlMap.set(tab.url, count + 1);
           }
