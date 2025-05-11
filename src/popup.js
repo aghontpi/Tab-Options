@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Helper Functions ---
 
+    // Update the header of the "All Open Tabs" list with the current count
+    function updateAllTabsHeader(count) {
+        const allTabsHeader = document.getElementById('all-tabs-header');
+        allTabsHeader.textContent = `All Open Tabs (${count})`;
+    }
+    
     function createTabListItem(tab, buttons = []) {
         const listItem = document.createElement('li');
         listItem.dataset.tabId = tab.id || ''; // Store tab ID if available
@@ -99,10 +105,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const savedTabs = await getSavedTabs();
             const urlMap = new Map();
     
+            updateAllTabsHeader(tabs.length);
             // Populate All Tabs list and build URL map (KEEP THIS PART AS IS)
-            // Consider all web pages except blank new tabs 
+            // Consider all web pages  
             tabs.forEach(tab => {
-                if (!tab.url || tab.url.startsWith('chrome://new')) {
+                if (!tab.url) {
                    return;
                 }
                 allTabsList.appendChild(createTabListItem(tab, [
@@ -209,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleSaveAndClose(tabId) {
         try {
             const tab = await chrome.tabs.get(tabId);
-            if (tab && tab.url && !tab.url.startsWith('chrome://new')) {
+            if (tab && tab.url) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
                 await chrome.tabs.remove(tabId);
                 refreshLists(); // Update UI
