@@ -324,23 +324,3 @@ async function getWindowIdForTab(tabId) {
         return windows.length > 0 ? windows[0].id : null; // Fallback
     }
 }
-
-// --- Context Menu ---
-// Create context menu for opening in full screen
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
-        id: 'openFullscreen',
-        title: 'Open in Full Screen',
-        contexts: ['action']
-    });
-});
-
-// Handle context menu clicks
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === 'openFullscreen') {
-        chrome.tabs.create({
-            url: chrome.runtime.getURL('popup.html?mode=fullscreen'),
-            active: true
-        });
-    }
-});
