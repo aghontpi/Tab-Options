@@ -7,6 +7,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const SAVED_TABS_KEY = 'savedTabs';
 
+    // Check and apply fullscreen styles
+    if (new URLSearchParams(window.location.search).get('mode') === 'fullscreen') {
+        document.body.classList.add('fullscreen-mode');
+        document.title = 'Tab Options - Full Screen View';
+    }
+
+    // Add event listener for the "Fullscreen" link
+    document.getElementById('fullscreen-link')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({
+            url: chrome.runtime.getURL('popup.html?mode=fullscreen'),
+            active: true,
+        });
+        window.close();
+    });
+
     // --- Helper Functions ---
 
     // Update the header of the "All Open Tabs" list with the current count

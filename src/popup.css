@@ -1,3 +1,61 @@
+:root {
+    --popup-width: 450px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px 0;
+}
+
+.header h1 {
+    margin: 0 4px 0 0;
+    font-size: 18px;
+    color: #333;
+}
+
+#fullscreen-link {
+    display: flex;
+    padding: 4px;
+    border-radius: 4px;
+    color: #666;
+    transition: background-color 0.2s;
+}
+
+#fullscreen-link:hover {
+    background-color: #eee;
+}
+
+body.fullscreen-mode {
+    width: auto;
+    max-width: 1000px;
+    margin: 20px auto;
+    min-height: auto;
+    max-height: none; 
+}
+
+@media (max-width: 1024px) {
+  body.fullscreen-mode {
+    max-width: 800px;
+  }
+}
+
+/* Adjust the list for scroll in fullscreen mode */
+body.fullscreen-mode ul {
+    max-height: none;
+}
+
+body.fullscreen-mode .header h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Hide fullscreen link in fullscreen mode */
+body.fullscreen-mode #fullscreen-link {
+    display: none;
+}
+
 .group-header {
     display: flex;             /* Use flexbox for layout */
     justify-content: space-between; /* Push text and button apart */
@@ -52,7 +110,7 @@
 }
 
 body {
-    width: 450px; /* Increased width a bit */
+    width: var(--popup-width);
     min-height: 100px;
     max-height: 500px; /* Limit height to prevent huge popups */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
