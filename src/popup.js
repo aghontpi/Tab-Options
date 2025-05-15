@@ -14,10 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Add event listener for the "Fullscreen" link
+
+    const popupHTML = new URL('./popup.html', import.meta.url).pathname;
     document.getElementById('fullscreen-link')?.addEventListener('click', (e) => {
+
         e.preventDefault();
         chrome.tabs.create({
-            url: chrome.runtime.getURL('popup.html?mode=fullscreen'),
+            url: chrome.runtime.getURL(popupHTML+"?mode=fullscreen"),
             active: true,
         });
         window.close();
@@ -30,7 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const allTabsHeader = document.getElementById('all-tabs-header');
         allTabsHeader.textContent = `All Open Tabs (${count})`;
     }
-    
+
+    const icon16 = new URL('./icons/icon16.png', import.meta.url).pathname;
     function createTabListItem(tab, buttons = []) {
         const listItem = document.createElement('li');
         listItem.dataset.tabId = tab.id || ''; // Store tab ID if available
@@ -38,9 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         listItem.title = `${tab.title}\n${tab.url}`; // Tooltip
 
         const img = document.createElement('img');
-        img.src = tab.favIconUrl || 'icons/icon16.png'; // Use favicon or default
+        img.src = tab.favIconUrl || icon16; // Use favicon or default
         img.classList.add('icon');
-        img.onerror = () => { img.src = 'icons/icon16.png'; }; // Fallback on error
+        img.onerror = () => { img.src = icon16; }; // Fallback on error
 
         const tabInfo = document.createElement('span');
         tabInfo.classList.add('tab-info');
@@ -57,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         listItem.appendChild(img);
         listItem.appendChild(tabInfo);
+        listItem.classList.add('tab-list-item');
 
         buttons.forEach(buttonConfig => {
             const button = document.createElement('button');
