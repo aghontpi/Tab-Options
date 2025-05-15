@@ -261,7 +261,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                   msgDiv.textContent = 'Redirecting back to prevent duplicate tab...';
                    // Basic styling
                    msgDiv.style.position = 'fixed';
-                   msgDiv.style.top = '10px';
+                   msgDiv.style.bottom = '10px';
                    msgDiv.style.left = '50%';
                    msgDiv.style.transform = 'translateX(-50%)';
                    msgDiv.style.padding = '10px 20px';
