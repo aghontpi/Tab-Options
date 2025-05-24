@@ -487,6 +487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleExportSavedTabs() {
         const savedTabs = await getSavedTabs();
+        const currentDate = new Date().toISOString().split('T')[0];
 
         let tabListItemsHTML = '';
         savedTabs.forEach(tab => {
@@ -503,8 +504,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        const pageTitle = "Exported Saved Tab List";
-        const headerTitle = "Exported Saved Tab List";
+        const pageTitle = `Exported Saved Tab List (${currentDate})`;
+        const headerTitle = `Exported Saved Tab List (${currentDate})`;
         const introText = "This file contains a list of your tabs saved for later from the tabOptions extension.";
 
         const htmlContent = generateExportHTML(pageTitle, headerTitle, introText, tabListItemsHTML);
@@ -513,7 +514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = 'tab_options_saved_tabs_export.html';
+        a.download = `tab_options_saved_tabs_export_${currentDate}.html`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(downloadUrl);
     }
 
@@ -521,6 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const openTabs = await chrome.tabs.query({
             url: ["http://*/*", "https://*/*"]
         });
+        const currentDate = new Date().toISOString().split('T')[0];
 
         let tabListItemsHTML = '';
         openTabs.forEach(tab => {
@@ -537,8 +539,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        const pageTitle = "Exported Open Tabs";
-        const headerTitle = "Exported Open Tabs";
+        const pageTitle = `Exported Open Tabs (${currentDate})`;
+        const headerTitle = `Exported Open Tabs (${currentDate})`;
         const introText = "This file contains a list of your currently open tabs exported from the tabOptions extension.";
 
         const htmlContent = generateExportHTML(pageTitle, headerTitle, introText, tabListItemsHTML);
@@ -547,7 +549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = 'tab_options_open_tabs_export.html';
+        a.download = `tab_options_open_tabs_export_${currentDate}.html`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(downloadUrl);
     }
 
