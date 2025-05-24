@@ -9,7 +9,7 @@ A lightweight Chrome extension that keeps your browsing session under control: i
 
 ## Features
 
-|            x             | Details                                                                                                                             |
+|            #             | Details                                                                                                                             |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Duplicate-Tab Detection  | Real-time badge counter plus a toast asking whether to merge (switch & close) or keep both tabs.                                    |
 | All Tabs Panel           | Popup (and optional full-screen view) listing every open tab, with buttons to **Close**, **Save & Close**, or **Save all & Close**. |
