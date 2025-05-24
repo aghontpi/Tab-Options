@@ -93,6 +93,10 @@ pnpm run dev
 1. Open Chrome → `chrome://extensions` → Enable **Developer mode**.
 2. Click **Load unpacked** and select the `dev-build/` folder.
 
+## Project Status
+
+https://trello.com/b/lrHGzH6P/tab-options
+
 ## License
 
 Apache License 2.0 - https://github.com/aghontpi/Tab-Options/blob/main/LICENSE
