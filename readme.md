@@ -61,7 +61,7 @@ A lightweight Chrome extension that keeps your browsing session under control: i
 ### Export
 
 <p align="center">
-  <img src="src/demo/export.png" height="300" alt="Export screen">
+  <img src="src/demo/export.png" height="auto" alt="Export screen">
 </p>
 
 ---
