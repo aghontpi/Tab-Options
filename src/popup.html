@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tab Options</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body { width: 400px; font-family: sans-serif; padding: 10px; }
+        .header-group { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        .header-group .header-main-content { display: flex; align-items: center; flex-grow: 1; }
+        .header-group h2 { margin: 0; padding: 0; border: none; font-size: 1.1em; color: #111; margin-right: 8px;}
+        .header-group:first-of-type { margin-top: 0; }
+        ul { list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; }
+        li { padding: 5px 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
+        li:last-child { border-bottom: none; }
+        .tab-info { flex-grow: 1; margin-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tab-title { font-weight: bold; display: block; }
+        .tab-url { color: #555; font-size: 0.9em; display: block; }
+        .icon { width: 16px; height: 16px; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+        .hidden-file-input { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Tab Options</h1>
+        <a href="#" id="fullscreen-link" title="Open in Full Screen">
+            <img src="icons/external-link.svg" width="16" height="16" alt="Open in Full Screen" />
+        </a>
+    </div>
+
+    <h2>Duplicate Tabs</h2>
+    <div id="duplicate-section">
+        <p id="no-duplicates-msg" style="display: none;">No duplicate tabs found.</p>
+        <ul id="duplicate-tabs-list">
+        </ul>
+    </div>
+
+    <div class="header-group">
+        <div class="header-main-content">
+            <h2 id="all-tabs-header">All Open Tabs</h2>
+            <button id="export-open-tabs" class="icon-button" title="Export Open Tabs">
+                <img src="icons/export-arrow.svg" alt="Export Open Tabs">
+                <span class="tooltip-text">Export Open Tabs</span>
+            </button>
+            <button id="import-open-tabs" class="icon-button" title="Import & Open Tabs">
+                <img src="icons/import-arrow.svg" alt="Import & Open Tabs">
+                <span class="tooltip-text">Import & Open Tabs</span>
+            </button>
+        </div>
+        <button id="save-and-close-tabs">Save all tabs & close</button>
+    </div>
+    <ul id="all-tabs-list">
+    </ul>
+
+    <div class="header-group">
+        <div class="header-main-content">
+            <h2>Saved Tabs</h2>
+            <button id="export-saved-tabs" class="icon-button" title="Export Saved Tab List">
+                <img src="icons/export-arrow.svg" alt="Export List">
+                <span class="tooltip-text">Export List</span>
+            </button>
+            <button id="import-saved-tabs" class="icon-button" title="Import to Saved Tab List">
+                <img src="icons/import-arrow.svg" alt="Import List">
+                <span class="tooltip-text">Import List</span>
+            </button>
+            <button id="delete-all-saved-tabs-btn" class="icon-button" title="Delete All Saved Tabs" style="display: none;">
+                <img src="icons/trash.svg" alt="Delete All Saved Tabs">
+                <span class="tooltip-text">Delete All Saved Tabs</span>
+            </button>
+        </div>
+        <button id="reopen-all-tabs">Reopen all tabs</button>
+    </div>
+    <div id="saved-section">
+         <p id="no-saved-tabs-msg" style="display: none;">No tabs saved for later.</p>
+        <ul id="saved-tabs-list">
+        </ul>
+    </div>
+
+    <input type="file" id="import-saved-file-input" class="hidden-file-input" accept=".html">
+    <input type="file" id="import-open-file-input" class="hidden-file-input" accept=".html">
+
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
