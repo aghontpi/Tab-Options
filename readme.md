@@ -85,7 +85,7 @@ Having dozens of identical tabs scattered across multiple windows and profile is
 
 ```bash
 git clone git@github.com:aghontpi/Tab-Options.git
-cd tab-options
+cd Tab-Options 
 pnpm install
 pnpm run dev
 ```
