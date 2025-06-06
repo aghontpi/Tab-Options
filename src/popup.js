@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SAVED_TABS_KEY = 'savedTabs';
     const { log } = await import('./utils/logger.js'); // Import the logger
 
+    function isFirefox() {
+        return typeof browser !== "undefined" && browser.runtime && browser.runtime.getURL("").startsWith("moz-extension://");
+    }
+
     browser.runtime.onMessage.addListener((message) => {
         if (message.action === "refreshUI") {
             refreshLists();
@@ -28,11 +32,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (new URLSearchParams(window.location.search).get('mode') === 'fullscreen') {
         document.body.classList.add('fullscreen-mode');
         document.title = 'Tab Options - Full Screen View';
+        log.info('Fullscreen mode activated.');
     }
 
     const popupHTML = new URL('./popup.html', import.meta.url).pathname;
-    document.getElementById('fullscreen-link')?.addEventListener('click', async (e) => {
-        e.preventDefault();
+    
+    async function openFullscreenView(additionalParams = '') {
         const tabs = await browser.tabs.query({});
         const fullscreenTab = tabs.find(tab =>
             tab.url?.includes(browser.runtime.getURL('')) &&
@@ -40,14 +45,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
 
         if (fullscreenTab) {
-            await browser.tabs.update(fullscreenTab.id, { active: true });
+            if (additionalParams) {
+                // If additional params provided, update the URL to include them
+                const newUrl = browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options" + additionalParams);
+                await browser.tabs.update(fullscreenTab.id, { url: newUrl, active: true });
+            } else {
+                // If no additional params, just activate the existing tab
+                await browser.tabs.update(fullscreenTab.id, { active: true });
+            }
             await browser.windows.update(fullscreenTab.windowId, { focused: true });
         } else {
             browser.tabs.create({
-                url: browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options"),
+                url: browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options" + additionalParams),
                 active: true,
             });
         }
+    }
+
+    document.getElementById('fullscreen-link')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await openFullscreenView();
         window.close();
     });
 
@@ -625,9 +642,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         log.info(`Open tabs exported to ${fileName}.`);
     }
 
-    function handleImportSavedTabsButtonClick() {
-        log.debug('Import saved tabs button clicked, triggering file input.');
-        importSavedFileInput.click();
+    function handleFullscreenImport(type, fileInput) {
+        if (isFirefox() && !document.body.classList.contains('fullscreen-mode')) {
+            log.debug(`Firefox detected (not in fullscreen), opening import in fullscreen tab for ${type}.`);
+            openFullscreenView(`&triggerImport=${type}`);
+            window.close(); // Close the small popup
+        } else {
+            log.debug(`Not Firefox or already in fullscreen, directly clicking file input for ${type}.`);
+            fileInput.click();
+        }
+    }
+
+    async function handleImportSavedTabsButtonClick() {
+        log.debug('Import saved tabs button clicked.');
+        // If it's Firefox AND we are NOT already in fullscreen mode
+        handleFullscreenImport('saved', importSavedFileInput);
     }
     async function handleImportSavedTabs(event) {
         const file = event.target.files[0];
@@ -704,9 +733,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         reader.readAsText(file);
     }
 
-    function handleImportOpenTabsButtonClick() {
-        log.debug('Import open tabs button clicked, triggering file input.');
-        importOpenFileInput.click();
+    async function handleImportOpenTabsButtonClick() {
+        log.debug('Import open tabs button clicked.');
+        // If it's Firefox AND we are NOT already in fullscreen mode
+        handleFullscreenImport('open', importOpenFileInput);
     }
     async function handleImportOpenTabs(event) {
         const file = event.target.files[0];
