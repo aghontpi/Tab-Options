@@ -6,11 +6,13 @@
     "permissions": [
       "tabs",      
       "scripting",
-      "storage",
-      "<all_urls>"
+      "storage"
+    ],
+    "host_permissions": [
+      "<all_urls>" 
     ],
     "background": {
-      "scripts": ["browser-polyfill.js", "background.js"]
+      "service_worker": "background.js"
     },
     "action": { 
         "default_icon": {
@@ -41,11 +43,5 @@
          ],
         "matches": ["<all_urls>"]
       }
-    ],
-    "browser_specific_settings": {
-        "gecko": {
-          "id": "tab-options@example.com", 
-          "strict_min_version": "109.0"
-        }
-    }
+    ]
 }

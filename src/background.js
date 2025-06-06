@@ -3,12 +3,12 @@ const newlyCreatedTabs = new Set();
 
 async function notifyPopupToRefresh() {
     try {
-        const tabs = await chrome.tabs.query({
-            url: `chrome-extension://${chrome.runtime.id}/popup*.html*`
+        const tabs = await browser.tabs.query({
+            url: `chrome-extension://${browser.runtime.id}/popup*.html*`
         });
         for (const tab of tabs) {
             try {
-                await chrome.tabs.sendMessage(tab.id, { action: "refreshUI" });
+                await browser.tabs.sendMessage(tab.id, { action: "refreshUI" });
             } catch (error) {
                 console.debug(`Could not send refresh message to popup tab ${tab.id}`);
             }
@@ -20,7 +20,7 @@ async function notifyPopupToRefresh() {
 
 async function updateDuplicateCountBadge() {
   try {
-      const tabs = await chrome.tabs.query({});
+      const tabs = await browser.tabs.query({});
       const urlMap = new Map();
       let totalDuplicateCount = 0;
 
@@ -38,19 +38,19 @@ async function updateDuplicateCountBadge() {
       });
 
       const text = totalDuplicateCount > 0 ? totalDuplicateCount.toString() : '';
-      await chrome.action.setBadgeText({ text: text });
+      await browser.action.setBadgeText({ text: text });
       
       if (totalDuplicateCount > 0) {
-           await chrome.action.setBadgeBackgroundColor({ color: '#FF0000' }); 
+           await browser.action.setBadgeBackgroundColor({ color: '#FF0000' }); 
       } else {
-          await chrome.action.setBadgeBackgroundColor({ color: '#FFFFFF00' }); 
+          await browser.action.setBadgeBackgroundColor({ color: '#FFFFFF00' }); 
       }
        console.log(`Badge updated. Total duplicate tabs: ${totalDuplicateCount}`);
 
   } catch (error) {
       console.error("Error updating duplicate count badge:", error);
        try {
-          await chrome.action.setBadgeText({ text: '' });
+          await browser.action.setBadgeText({ text: '' });
        } catch (clearError) {
            console.error("Error clearing badge text:", clearError);
        }
@@ -70,7 +70,7 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
 
   try {
     const cleanUrl = url.includes("mail.google.com") && url.includes("#") ? url.split('#')[0] : url; 
-    const duplicateTabs = await chrome.tabs.query({ url: cleanUrl });
+    const duplicateTabs = await browser.tabs.query({ url: cleanUrl });
     const existingTab = duplicateTabs.find(t => t.id !== tabId);
 
       if (existingTab) {
@@ -78,24 +78,24 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
           promptingTabs.add(tabId); 
 
           try {
-              await chrome.scripting.executeScript({
+              await browser.scripting.executeScript({
                   target: { tabId: tabId },
                   files: ['content_script.js']
               });
 
-              await chrome.scripting.insertCSS({
+              await browser.scripting.insertCSS({
                   target: { tabId: tabId },
                   files: ['style.css']
               });
 
-              chrome.tabs.sendMessage(tabId, {
+              browser.tabs.sendMessage(tabId, {
                   action: "showConfirmation",
                   existingTabId: existingTab.id,
                   currentTabId: tabId,
                   isNavigation: isNavigation 
               }, (response) => {
-                  if (chrome.runtime.lastError) {
-                      console.warn(`Could not send message to tab ${tabId}: ${chrome.runtime.lastError.message}. Tab might be closed or unreachable.`);
+                  if (browser.runtime.lastError) {
+                      console.warn(`Could not send message to tab ${tabId}: ${browser.runtime.lastError.message}. Tab might be closed or unreachable.`);
                       promptingTabs.delete(tabId); 
                       updateDuplicateCountBadge(); 
                   } else if (response && response.status === "received") {
@@ -132,13 +132,13 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
   }
 }
 
-chrome.tabs.onCreated.addListener((tab) => {
+browser.tabs.onCreated.addListener((tab) => {
   console.log(`Tab created: ${tab.id}`);
   newlyCreatedTabs.add(tab.id);
   if (tab.pendingUrl && !tab.pendingUrl.startsWith('chrome://new')) {
       setTimeout(async () => {
           try {
-              const updatedTab = await chrome.tabs.get(tab.id);
+              const updatedTab = await browser.tabs.get(tab.id);
               if (updatedTab && updatedTab.url && !promptingTabs.has(tab.id)) {
                   checkForDuplicateAndConfirm(updatedTab.id, updatedTab.url, false);
               } else {
@@ -158,7 +158,7 @@ chrome.tabs.onCreated.addListener((tab) => {
 });
 
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const urlChanged = changeInfo.url;
   const loadingStarted = changeInfo.status === 'loading';
   const loadCompleted = changeInfo.status === 'complete' && tab.url && !tab.url.startsWith('chrome://new');
@@ -184,7 +184,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!sender.tab) {
       return false; 
   }
@@ -198,13 +198,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       (async () => {
           let mergeSuccess = false;
           try {
-              await chrome.tabs.update(message.existingTabId, { active: true });
+              await browser.tabs.update(message.existingTabId, { active: true });
 
-              const existingTabDetails = await chrome.tabs.get(message.existingTabId);
-              await chrome.windows.update(existingTabDetails.windowId, { focused: true });
+              const existingTabDetails = await browser.tabs.get(message.existingTabId);
+              await browser.windows.update(existingTabDetails.windowId, { focused: true });
 
 
-              await chrome.tabs.remove(tabId);
+              await browser.tabs.remove(tabId);
               mergeSuccess = true; 
               sendResponse({ status: "merge complete" });
               updateDuplicateCountBadge();
@@ -232,7 +232,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       
       if (message.isNavigation && message.action === "keepTab") {
           console.log(`Tab ${tabId} resulted from navigation, attempting to go back.`);
-          chrome.scripting.executeScript({
+          browser.scripting.executeScript({
               target: { tabId: tabId },
               func: () => {
                   const msgDiv = document.createElement('div');
@@ -267,7 +267,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
   console.log(`Tab removed: ${tabId}`);
   const wasPrompting = promptingTabs.delete(tabId);
   const wasNewlyCreated = newlyCreatedTabs.delete(tabId); 
@@ -283,11 +283,11 @@ updateDuplicateCountBadge();
 
 async function getWindowIdForTab(tabId) {
     try {
-        const tab = await chrome.tabs.get(tabId);
+        const tab = await browser.tabs.get(tabId);
         return tab.windowId;
     } catch (error) {
         console.error(`Could not get window ID for tab ${tabId}: ${error}`);
-        const windows = await chrome.windows.getAll();
+        const windows = await browser.windows.getAll();
         return windows.length > 0 ? windows[0].id : null; 
     }
 }

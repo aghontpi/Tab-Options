@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const SAVED_TABS_KEY = 'savedTabs';
 
-    chrome.runtime.onMessage.addListener((message) => {
+    browser.runtime.onMessage.addListener((message) => {
         if (message.action === "refreshUI") {
             refreshLists();
         }
@@ -32,18 +32,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const popupHTML = new URL('./popup.html', import.meta.url).pathname;
     document.getElementById('fullscreen-link')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        const tabs = await chrome.tabs.query({});
+        const tabs = await browser.tabs.query({});
         const fullscreenTab = tabs.find(tab =>
-            tab.url?.includes(chrome.runtime.getURL('')) &&
+            tab.url?.includes(browser.runtime.getURL('')) &&
             tab.url?.includes('mode=fullscreen&name=tab-options')
         );
 
         if (fullscreenTab) {
-            await chrome.tabs.update(fullscreenTab.id, { active: true });
-            await chrome.windows.update(fullscreenTab.windowId, { focused: true });
+            await browser.tabs.update(fullscreenTab.id, { active: true });
+            await browser.windows.update(fullscreenTab.windowId, { focused: true });
         } else {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options"),
+            browser.tabs.create({
+                url: browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options"),
                 active: true,
             });
         }
@@ -96,8 +96,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tabId = parseInt(listItem.dataset.tabId);
             if (!isNaN(tabId)) {
                 try {
-                    const { windowId } = await chrome.tabs.update(tabId, { active: true });
-                    await chrome.windows.update(windowId, { focused: true });
+                    const { windowId } = await browser.tabs.update(tabId, { active: true });
+                    await browser.windows.update(windowId, { focused: true });
                 } catch (err) {
                     console.error("Failed to activate tab/window:", err);
                 }
@@ -107,12 +107,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function getSavedTabs() {
-        const result = await chrome.storage.local.get(SAVED_TABS_KEY);
+        const result = await browser.storage.local.get(SAVED_TABS_KEY);
         return result[SAVED_TABS_KEY] || [];
     }
 
     async function saveTabsToStorage(tabs) {
-        await chrome.storage.local.set({ [SAVED_TABS_KEY]: tabs });
+        await browser.storage.local.set({ [SAVED_TABS_KEY]: tabs });
     }
 
     async function addTabToSaved(tabInfo) {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function clearSavedTabs() {
-        await chrome.storage.local.remove(SAVED_TABS_KEY);
+        await browser.storage.local.remove(SAVED_TABS_KEY);
     }
 
     function escapeHTML(str) {
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const tab of tabsToOpen) {
             if (tab.url) { 
                 try {
-                    await chrome.tabs.create({ url: tab.url, active: makeActive }); 
+                    await browser.tabs.create({ url: tab.url, active: makeActive }); 
                     openedCount++;
                 } catch (tabError) {
                     console.error(`Failed to open tab for URL ${tab.url}:`, tabError);
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteAllSavedTabsButton.style.display = 'none'; 
 
         try {
-            const tabs = await chrome.tabs.query({});
+            const tabs = await browser.tabs.query({});
             const savedTabs = await getSavedTabs();
             const urlMap = new Map();
 
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     closeAllButton.addEventListener('click', async () => {
                         const tabIdsToClose = tabsWithSameUrl.filter((_, index) => index !== 0).map(tab => tab.id);
                         try {
-                            await chrome.tabs.remove(tabIdsToClose);
+                            await browser.tabs.remove(tabIdsToClose);
                             refreshLists();
                         } catch (error) {
                             console.error("Error closing duplicate tabs:", error);
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleCloseTab(tabId) {
         try {
-            await chrome.tabs.remove(tabId);
+            await browser.tabs.remove(tabId);
             refreshLists();
         } catch (error) {
             console.error(`Failed to close tab ${tabId}:`, error);
@@ -386,13 +386,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleSaveAndClose(tabId) {
         try {
-            const tab = await chrome.tabs.get(tabId);
+            const tab = await browser.tabs.get(tabId);
             if (tab && tab.url) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
-                await chrome.tabs.remove(tabId);
+                await browser.tabs.remove(tabId);
                 refreshLists();
             } else {
-                 await chrome.tabs.remove(tabId);
+                 await browser.tabs.remove(tabId);
                  refreshLists();
             }
         } catch (error) {
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleReopenTab(url) {
         try {
             await removeTabFromSaved(url);
-            await chrome.tabs.create({ url: url, active: true });
+            await browser.tabs.create({ url: url, active: true });
             refreshLists();
         } catch (error) {
             console.error(`Failed to reopen tab for URL ${url}:`, error);
@@ -423,29 +423,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleSaveAllAndClose() {
         try {
-            const tabs = await chrome.tabs.query({});
+            const tabs = await browser.tabs.query({});
             const tabsToSave = tabs.filter(tab =>
                 tab.url &&
-                !tab.url.startsWith('chrome:') &&
-                !tab.url.startsWith('chrome-extension:') &&
-                 tab.id !== chrome.runtime.id
+                !tab.url.startsWith('chrome:') && // Keep 'chrome:' for internal browser pages
+                !tab.url.startsWith('chrome-extension:') && // Keep 'chrome-extension:'
+                 tab.id !== browser.runtime.id // chrome.runtime.id -> browser.runtime.id
             );
             for (const tab of tabsToSave) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
             }
             let tabIdsToClose = tabsToSave.map(tab => tab.id);
-            const currentTab = await chrome.tabs.getCurrent();
+            const currentTab = await browser.tabs.getCurrent(); // chrome.tabs.getCurrent -> browser.tabs.getCurrent (Note: getCurrent is not available in all contexts in Firefox MV3, might need alternative if issues arise)
             if (currentTab && tabIdsToClose.includes(currentTab.id)) {
                 tabIdsToClose = tabIdsToClose.filter(id => id !== currentTab.id);
             }
             const fullscreenTab = tabs.find(tab =>
-                tab.url?.includes(chrome.runtime.getURL('')) &&
+                tab.url?.includes(browser.runtime.getURL('')) && // chrome.runtime.getURL -> browser.runtime.getURL
                 tab.url?.includes('mode=fullscreen&name=tab-options')
             );
             if (fullscreenTab && tabIdsToClose.includes(fullscreenTab.id)) {
                 tabIdsToClose = tabIdsToClose.filter(id => id !== fullscreenTab.id);
             }
-            if (tabIdsToClose.length > 0) await chrome.tabs.remove(tabIdsToClose);
+            if (tabIdsToClose.length > 0) await browser.tabs.remove(tabIdsToClose);
             refreshLists();
         } catch (error) {
             console.error("Failed to save and close all tabs:", error);
@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function handleExportOpenTabs() {
-        const openTabs = await chrome.tabs.query({
+        const openTabs = await browser.tabs.query({
             url: ["http://*/*", "https://*/*"]
         });
         const currentDate = new Date().toISOString().split('T')[0];
