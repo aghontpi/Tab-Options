@@ -5,10 +5,10 @@
   "scripts": {
     "copy-manifest:chrome": "node scripts/copy-manifest.js chrome",
     "copy-manifest:firefox": "node scripts/copy-manifest.js firefox",
-    "dev:chrome": "pnpm copy-manifest:chrome && rimraf dev-build/chrome && parcel watch src/manifest.json --host localhost --config @parcel/config-webextension --dist-dir dev-build/chrome --no-cache",
-    "dev:firefox": "pnpm copy-manifest:firefox && rimraf dev-build/firefox && parcel watch src/manifest.json --host localhost --config @parcel/config-webextension --dist-dir dev-build/firefox --no-cache",
-    "build:chrome": "pnpm copy-manifest:chrome && rimraf dist/chrome && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/chrome --no-cache --no-source-maps",
-    "build:firefox": "pnpm copy-manifest:firefox && rimraf dist/firefox && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/firefox --no-cache --no-source-maps",
+    "dev:chrome": "pnpm copy-manifest:chrome && rimraf dev-build && parcel watch src/manifest.json --host localhost --config @parcel/config-webextension --dist-dir dev-build/chrome --no-cache",
+    "dev:firefox": "pnpm copy-manifest:firefox && rimraf dev-build && parcel watch src/manifest.json --host localhost --config @parcel/config-webextension --dist-dir dev-build/firefox --no-cache",
+    "build:chrome": "pnpm copy-manifest:chrome && rimraf dist && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/chrome --no-cache --no-source-maps",
+    "build:firefox": "pnpm copy-manifest:firefox && rimraf dist && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/firefox --no-cache --no-source-maps",
     "start": "pnpm dev:chrome",
     "build": "pnpm build:chrome && pnpm build:firefox"
   },
