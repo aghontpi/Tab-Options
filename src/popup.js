@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function handleFullscreenImport(type, fileInput) {
         if (isFirefox() && !document.body.classList.contains('fullscreen-mode')) {
-            log.debug(`Firefox detected (not in fullscreen), opening import in fullscreen tab for ${type}.`);
+            log.debug(`Firefox detected (not in fullscreen), opening in fullscreen tab.`);
             openFullscreenView(`&triggerImport=${type}`);
             window.close(); // Close the small popup
         } else {
@@ -738,6 +738,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // If it's Firefox AND we are NOT already in fullscreen mode
         handleFullscreenImport('open', importOpenFileInput);
     }
+
     async function handleImportOpenTabs(event) {
         const file = event.target.files[0];
         if (!file) {

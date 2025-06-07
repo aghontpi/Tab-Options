@@ -3,10 +3,21 @@ const newlyCreatedTabs = new Set();
 
 async function notifyPopupToRefresh() {
     try {
-        const tabs = await browser.tabs.query({
-            url: `chrome-extension://${browser.runtime.id}/popup*.html*`
-        });
-        for (const tab of tabs) {
+        // Get the extension's base URL for cross-browser compatibility
+        const extensionUrl = browser.runtime.getURL('');
+        const tabs = await browser.tabs.query({});
+        
+        // Filter tabs that are our extension's popup pages
+        const popupTabs = tabs.filter(tab => 
+            tab.url && 
+            tab.url.startsWith(extensionUrl) && (
+                tab.url.includes('mode=fullscreen&name=tab-options') ||
+                // Check if it's the popup by checking if it's an extension page that's not the background
+                (tab.url.includes('.html') && !tab.url.includes('background'))
+            )
+        );
+        
+        for (const tab of popupTabs) {
             try {
                 await browser.tabs.sendMessage(tab.id, { action: "refreshUI" });
             } catch (error) {
