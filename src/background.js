@@ -1,3 +1,7 @@
+import  "./browser-polyfill.js"
+
+const { log } = require('./utils/logger.js');
+
 const promptingTabs = new Set();
 const newlyCreatedTabs = new Set();
 
@@ -21,11 +25,11 @@ async function notifyPopupToRefresh() {
             try {
                 await browser.tabs.sendMessage(tab.id, { action: "refreshUI" });
             } catch (error) {
-                console.debug(`Could not send refresh message to popup tab ${tab.id}`);
+                log.debug(`Could not send refresh message to popup tab ${tab.id}`);
             }
         }
     } catch (error) {
-        console.debug("Error notifying popup to refresh:", error);
+        log.debug("Error notifying popup to refresh:", error);
     }
 }
 
@@ -56,21 +60,21 @@ async function updateDuplicateCountBadge() {
       } else {
           await browser.action.setBadgeBackgroundColor({ color: '#FFFFFF00' }); 
       }
-       console.log(`Badge updated. Total duplicate tabs: ${totalDuplicateCount}`);
+      log.info(`Badge updated. Total duplicate tabs: ${totalDuplicateCount}`);
 
   } catch (error) {
-      console.error("Error updating duplicate count badge:", error);
+      log.error("Error updating duplicate count badge:", error);
        try {
           await browser.action.setBadgeText({ text: '' });
        } catch (clearError) {
-           console.error("Error clearing badge text:", clearError);
+           log.error("Error clearing badge text:", clearError);
        }
   }
 }
 
 async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
   if (promptingTabs.has(tabId)) {
-      console.log(`Tab ${tabId} is already being prompted.`);
+      log.info(`Tab ${tabId} is already being prompted.`);
       return;
   }
 
@@ -85,7 +89,7 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
     const existingTab = duplicateTabs.find(t => t.id !== tabId);
 
       if (existingTab) {
-          console.log(`Duplicate detected: Tab ${tabId} (${url}) vs Tab ${existingTab.id}`);
+          log.info(`Duplicate detected: Tab ${tabId} (${url}) vs Tab ${existingTab.id}`);
           promptingTabs.add(tabId); 
 
           try {
@@ -106,19 +110,19 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
                   isNavigation: isNavigation 
               }, (response) => {
                   if (browser.runtime.lastError) {
-                      console.warn(`Could not send message to tab ${tabId}: ${browser.runtime.lastError.message}. Tab might be closed or unreachable.`);
+                      log.warn(`Could not send message to tab ${tabId}: ${browser.runtime.lastError.message}. Tab might be closed or unreachable.`);
                       promptingTabs.delete(tabId); 
                       updateDuplicateCountBadge(); 
                   } else if (response && response.status === "received") {
-                      console.log(`Confirmation prompt shown in tab ${tabId}`);
+                      log.info(`Confirmation prompt shown in tab ${tabId}`);
                   } else {
-                      console.warn(`Confirmation prompt message to tab ${tabId} did not get expected response.`);
+                      log.warn(`Confirmation prompt message to tab ${tabId} did not get expected response.`);
                       promptingTabs.delete(tabId); 
                       updateDuplicateCountBadge(); 
                   }
               });
           } catch (injectionError) {
-               console.warn(`Failed to inject script/CSS or send message to tab ${tabId}`, injectionError);
+               log.warn(`Failed to inject script/CSS or send message to tab ${tabId}`, injectionError);
                promptingTabs.delete(tabId); 
                updateDuplicateCountBadge(); 
                notifyPopupToRefresh();
@@ -129,14 +133,14 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
           notifyPopupToRefresh();
       }
   } catch (error) {
-      console.error(`Error checking/confirming duplicate: ${error}`);
+      log.error(`Error checking/confirming duplicate: ${error}`);
       if (promptingTabs.has(tabId)) {
           promptingTabs.delete(tabId); 
       }
       if (error.message.includes("No tab with id") || error.message.includes("Invalid tab ID")) {
-          console.warn("Tab related to check was likely closed.");
+          log.warn("Tab related to check was likely closed.");
       } else {
-           console.error("Unexpected error during duplicate check:", error);
+           log.error("Unexpected error during duplicate check:", error);
       }
       updateDuplicateCountBadge(); 
       notifyPopupToRefresh();
@@ -144,7 +148,7 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
 }
 
 browser.tabs.onCreated.addListener((tab) => {
-  console.log(`Tab created: ${tab.id}`);
+  log.info(`Tab created: ${tab.id}`);
   newlyCreatedTabs.add(tab.id);
   if (tab.pendingUrl && !tab.pendingUrl.startsWith('chrome://new')) {
       setTimeout(async () => {
@@ -157,7 +161,7 @@ browser.tabs.onCreated.addListener((tab) => {
                    notifyPopupToRefresh();
               }
           } catch (e) {
-              console.log(`Tab ${tab.id} likely closed before delayed check.`);
+              log.info(`Tab ${tab.id} likely closed before delayed check.`);
               updateDuplicateCountBadge(); 
               notifyPopupToRefresh();
           }
@@ -175,7 +179,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const loadCompleted = changeInfo.status === 'complete' && tab.url && !tab.url.startsWith('chrome://new');
 
   if (urlChanged || loadingStarted || loadCompleted) {
-     console.log(`Tab updated: ${tabId}, changeInfo:`, changeInfo);
+     log.info(`Tab updated: ${tabId}, changeInfo:`, changeInfo);
       const checkUrl = (loadCompleted && tab.url) ? tab.url : changeInfo.url; 
       if (checkUrl && !checkUrl.startsWith('chrome://new')) {
           const isNavigation = !newlyCreatedTabs.has(tabId); 
@@ -190,7 +194,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       } else if (loadingStarted && !checkUrl) {
           // It's loading but we don't have a final URL yet, could update badge here
           // or wait for 'complete' or a 'changeInfo.url' event. Let's wait.
-          // console.log(`Tab ${tabId} started loading, waiting for URL/complete.`);
+          // log.debug(`Tab ${tabId} started loading, waiting for URL/complete.`);
       }
   }
 });
@@ -203,7 +207,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const tabId = sender.tab.id;
 
   if (message.action === "mergeTabs") {
-      console.log(`User chose MERGE for Tab ${tabId}. Focusing ${message.existingTabId} and closing ${tabId}`);
+      log.info(`User chose MERGE for Tab ${tabId}. Focusing ${message.existingTabId} and closing ${tabId}`);
       promptingTabs.delete(tabId); 
 
       (async () => {
@@ -222,7 +226,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
               notifyPopupToRefresh();
 
           } catch (err) {
-              console.error(`Error during merge action: ${err}`);
+              log.error(`Error during merge action: ${err}`);
               sendResponse({ status: "merge failed", error: err.message });
           } finally {
                updateDuplicateCountBadge();
@@ -235,14 +239,14 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       promptingTabs.delete(tabId); 
 
       if (message.action === "keepTab") {
-          console.log(`User chose KEEP for Tab ${tabId}`);
+          log.info(`User chose KEEP for Tab ${tabId}`);
       } else { 
-           console.log(`Confirmation prompt closed by user in Tab ${tabId}. Keeping tab.`);
+           log.info(`Confirmation prompt closed by user in Tab ${tabId}. Keeping tab.`);
       }
 
       
       if (message.isNavigation && message.action === "keepTab") {
-          console.log(`Tab ${tabId} resulted from navigation, attempting to go back.`);
+          log.info(`Tab ${tabId} resulted from navigation, attempting to go back.`);
           browser.scripting.executeScript({
               target: { tabId: tabId },
               func: () => {
@@ -263,7 +267,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                    setTimeout(() => msgDiv.remove(), 3000);
                   history.back();
               }
-          }).catch(err => console.error(`Failed to execute history.back() script in tab ${tabId}: ${err}`));
+          }).catch(err => log.error(`Failed to execute history.back() script in tab ${tabId}: ${err}`));
            sendResponse({ status: "keep completed, navigating back" });
 
       } else {
@@ -279,12 +283,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  console.log(`Tab removed: ${tabId}`);
+  log.info(`Tab removed: ${tabId}`);
   const wasPrompting = promptingTabs.delete(tabId);
   const wasNewlyCreated = newlyCreatedTabs.delete(tabId); 
 
   if (wasPrompting) {
-      console.log(`Tab ${tabId} closed while prompting.`);
+      log.info(`Tab ${tabId} closed while prompting.`);
   }
   updateDuplicateCountBadge();
   notifyPopupToRefresh();
@@ -297,7 +301,7 @@ async function getWindowIdForTab(tabId) {
         const tab = await browser.tabs.get(tabId);
         return tab.windowId;
     } catch (error) {
-        console.error(`Could not get window ID for tab ${tabId}: ${error}`);
+        log.error(`Could not get window ID for tab ${tabId}: ${error}`);
         const windows = await browser.windows.getAll();
         return windows.length > 0 ? windows[0].id : null; 
     }
