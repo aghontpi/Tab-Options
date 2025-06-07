@@ -31,7 +31,7 @@ if (!window.duplicateTabMergerHasRun) {
       mergeButton.textContent = 'Merge (Switch & Close)';
       mergeButton.id = 'dtm-merge-button';
       mergeButton.addEventListener('click', () => {
-        chrome.runtime.sendMessage({
+        browser.runtime.sendMessage({
             action: 'mergeTabs',
             existingTabId: messageData.existingTabId,
             currentTabId: messageData.currentTabId,
@@ -45,7 +45,7 @@ if (!window.duplicateTabMergerHasRun) {
       keepButton.id = 'dtm-keep-button';
       keepButton.style.marginLeft = '10px';
       keepButton.addEventListener('click', () => {
-        chrome.runtime.sendMessage({
+        browser.runtime.sendMessage({
             action: 'keepTab',
             currentTabId: messageData.currentTabId,
             isNavigation: messageData.isNavigation
@@ -58,7 +58,7 @@ if (!window.duplicateTabMergerHasRun) {
        closeButton.id = 'dtm-close-button';
        closeButton.title = 'Close this prompt (keeps tab)';
        closeButton.addEventListener('click', () => {
-           chrome.runtime.sendMessage({
+           browser.runtime.sendMessage({
                action: 'promptClosed', 
                currentTabId: messageData.currentTabId,
                isNavigation: messageData.isNavigation
@@ -79,7 +79,7 @@ if (!window.duplicateTabMergerHasRun) {
     }
   
   
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.action === "showConfirmation") {
         request.windowId = window.id; 
         showConfirmationDialog(request);
