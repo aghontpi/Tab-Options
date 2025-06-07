@@ -311,7 +311,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj/reviews" target="_blank" rel="noopener noreferrer">leaving a review</a>.
             <br>
             You can also find us on the 
-            <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>.
+            <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
+            or the
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/tab-options-open-source/" target="_blank" rel="noopener noreferrer">Firefox Add-ons Store</a>.
         </p>
     </div>
 </body>
