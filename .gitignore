@@ -18,3 +18,6 @@ pnpm-lock.yaml
 .vscode/
 .idea/
 .parcel-cache/
+
+# Ignore generated manifest.json (use browser-specific manifests instead)
+src/manifest.json
