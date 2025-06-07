@@ -1,6 +1,6 @@
 {
   "name": "Tab-Options",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Detects duplicate tabs, asks before closing duplicate tabs and focuses the existing one. Export and Import tabs",
   "scripts": {
     "copy-manifest:chrome": "node scripts/copy-manifest.js chrome",
