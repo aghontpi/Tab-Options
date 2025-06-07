@@ -642,10 +642,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         log.info(`Open tabs exported to ${fileName}.`);
     }
 
-    function handleFullscreenImport(type, fileInput) {
+    async function handleFullscreenImport(type, fileInput) {
         if (isFirefox() && !document.body.classList.contains('fullscreen-mode')) {
             log.debug(`Firefox detected (not in fullscreen), opening in fullscreen tab.`);
-            openFullscreenView(`&triggerImport=${type}`);
+            await openFullscreenView(`&triggerImport=${type}`);
             window.close(); // Close the small popup
         } else {
             log.debug(`Not Firefox or already in fullscreen, directly clicking file input for ${type}.`);
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleImportSavedTabsButtonClick() {
         log.debug('Import saved tabs button clicked.');
         // If it's Firefox AND we are NOT already in fullscreen mode
-        handleFullscreenImport('saved', importSavedFileInput);
+        await handleFullscreenImport('saved', importSavedFileInput);
     }
     async function handleImportSavedTabs(event) {
         const file = event.target.files[0];
@@ -736,7 +736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleImportOpenTabsButtonClick() {
         log.debug('Import open tabs button clicked.');
         // If it's Firefox AND we are NOT already in fullscreen mode
-        handleFullscreenImport('open', importOpenFileInput);
+        await handleFullscreenImport('open', importOpenFileInput);
     }
 
     async function handleImportOpenTabs(event) {
