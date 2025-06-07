@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { log } = await import('./utils/logger.js'); // Import the logger
 
     function isFirefox() {
-        return typeof browser !== "undefined" && browser.runtime && browser.runtime.getURL("").startsWith("moz-extension://");
+        return typeof browser !== "undefined" && 
+               browser.runtime && 
+               (browser.runtime.getURL("").startsWith("moz-extension://") ||
+                navigator.userAgent.includes("Firefox"));
     }
 
     browser.runtime.onMessage.addListener((message) => {
@@ -484,6 +487,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function getCurrentTab() {
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        return tabs[0];
+    }
+    
+
     async function handleSaveAllAndClose() {
         log.info('Attempting to save all and close tabs.');
         try {
@@ -499,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             log.debug(`${tabsToSave.length} tabs marked for saving.`);
             let tabIdsToClose = tabsToSave.map(tab => tab.id);
-            const currentTab = await browser.tabs.getCurrent(); // chrome.tabs.getCurrent -> browser.tabs.getCurrent (Note: getCurrent is not available in all contexts in Firefox MV3, might need alternative if issues arise)
+            const currentTab = await getCurrentTab();
             if (currentTab && tabIdsToClose.includes(currentTab.id)) {
                 tabIdsToClose = tabIdsToClose.filter(id => id !== currentTab.id);
             }

@@ -118,7 +118,7 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
                   }
               });
           } catch (injectionError) {
-               console.warn(`Failed to inject script/CSS or send message to tab ${tabId} (likely closed): ${injectionError.message}`);
+               console.warn(`Failed to inject script/CSS or send message to tab ${tabId}`, injectionError);
                promptingTabs.delete(tabId); 
                updateDuplicateCountBadge(); 
                notifyPopupToRefresh();
