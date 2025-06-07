@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const { windowId } = await browser.tabs.update(tabId, { active: true });
                     await browser.windows.update(windowId, { focused: true });
                 } catch (err) {
-                    console.error("Failed to activate tab/window:", err);
+                    log.error("Failed to activate tab/window:", err);
                 }
             }
         });
@@ -329,7 +329,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     openedCount++;
                 } catch (tabError) {
                     log.error(`Failed to open tab for URL ${tab.url}:`, tabError);
-                    console.error(`Failed to open tab for URL ${tab.url}:`, tabError);
                 }
             } else {
                 log.warn('Skipping tab with no URL in openTabsFromList.', tab);
@@ -388,7 +387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             await browser.tabs.remove(tabIdsToClose);
                             refreshLists();
                         } catch (error) {
-                            console.error("Error closing duplicate tabs:", error);
+                            log.error("Error closing duplicate tabs:", error);
                             refreshLists();
                         }
                     });
@@ -422,7 +421,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             log.error("Error refreshing lists:", error);
-            console.error("Error refreshing lists:", error);
             deleteAllSavedTabsButton.style.display = 'none'; 
         }
     }
@@ -435,7 +433,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             refreshLists();
         } catch (error) {
             log.error(`Failed to close tab ${tabId}:`, error);
-            console.error(`Failed to close tab ${tabId}:`, error);
             refreshLists();
         }
     }
@@ -456,7 +453,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             log.error(`Failed to save and close tab ${tabId}:`, error);
-            console.error(`Failed to save and close tab ${tabId}:`, error);
             refreshLists();
         }
     }
@@ -470,7 +466,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             refreshLists();
         } catch (error) {
             log.error(`Failed to reopen tab for URL ${url}:`, error);
-            console.error(`Failed to reopen tab for URL ${url}:`, error);
         }
     }
 
@@ -483,7 +478,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error)
         {
             log.error(`Failed to delete saved tab for URL ${url}:`, error);
-            console.error(`Failed to delete saved tab for URL ${url}:`, error);
         }
     }
 
@@ -499,9 +493,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tabs = await browser.tabs.query({});
             const tabsToSave = tabs.filter(tab =>
                 tab.url &&
-                !tab.url.startsWith('chrome:') && // Keep 'chrome:' for internal browser pages
-                !tab.url.startsWith('chrome-extension:') && // Keep 'chrome-extension:'
-                 tab.id !== browser.runtime.id // chrome.runtime.id -> browser.runtime.id
+                !tab.url.startsWith('chrome:') // Keep 'chrome:' for internal browser pages
+                && !tab.url.startsWith('chrome-extension:') // Keep 'chrome-extension:'
+                 && tab.id !== browser.runtime.id // chrome.runtime.id -> browser.runtime.id
             );
             for (const tab of tabsToSave) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
@@ -527,7 +521,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             refreshLists();
         } catch (error) {
             log.error("Failed to save and close all tabs:", error);
-            console.error("Failed to save and close all tabs:", error);
         }
     }
 
@@ -542,11 +535,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 refreshLists();
             } else {
                 log.info("No saved tabs to reopen.");
-                console.log("No saved tabs to reopen.");
             }
         } catch (error) {
             log.error("Failed to reopen all tabs:", error);
-            console.error("Failed to reopen all tabs:", error);
         }
     }
 
@@ -567,7 +558,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 log.info("All saved tabs successfully deleted by user confirmation.");
             } catch (error) {
                 log.error("Failed to delete all saved tabs:", error);
-                console.error("Failed to delete all saved tabs:", error);
                 alert("An error occurred while trying to delete all saved tabs.");
             }
         } else {
@@ -727,7 +717,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             } catch (error) {
                 log.error("Error parsing imported file for saved tabs:", error);
-                console.error("Error parsing imported file for saved tabs:", error);
                 alert("Error importing to saved list. Please ensure the file is a valid exported HTML file.");
             } finally {
                 importSavedFileInput.value = ''; // Reset file input
@@ -735,7 +724,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         reader.onerror = (e) => {
             log.error("Error reading file for saved tabs import:", e);
-            console.error("Error reading file:", e);
             alert("Error reading the selected file.");
             importSavedFileInput.value = '';
         };
@@ -787,7 +775,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             } catch (error) {
                 log.error("Error parsing imported file for opening tabs:", error);
-                console.error("Error parsing imported file for opening tabs:", error);
                 alert("Error importing and opening tabs. Please ensure the file is a valid exported HTML file.");
             } finally {
                 importOpenFileInput.value = ''; // Reset file input
@@ -795,7 +782,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         reader.onerror = (e) => {
             log.error("Error reading file for opening tabs import:", e);
-            console.error("Error reading file:", e);
             alert("Error reading the selected file.");
             importOpenFileInput.value = '';
         };
