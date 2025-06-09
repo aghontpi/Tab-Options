@@ -10,7 +10,12 @@
     "build:chrome": "pnpm copy-manifest:chrome && rimraf dist && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/chrome --no-cache --no-source-maps",
     "build:firefox": "pnpm copy-manifest:firefox && rimraf dist && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/firefox --no-cache --no-source-maps",
     "start": "pnpm dev:chrome",
-    "build": "pnpm build:chrome && pnpm build:firefox"
+    "build": "pnpm build:chrome && pnpm build:firefox",
+    "zip:chrome": "node scripts/create-zip.js chrome",
+    "zip:firefox": "node scripts/create-zip.js firefox",
+    "package:chrome": "pnpm build:chrome && pnpm zip:chrome",
+    "package:firefox": "pnpm build:firefox && pnpm zip:firefox",
+    "package": "rimraf release && pnpm package:chrome && pnpm package:firefox"
   },
   "keywords": [
     "tabs",
@@ -25,6 +30,7 @@
     "parcel": "^2.14.4",
     "rimraf": "^6.0.1",
     "svgo": "^3.3.2",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "archiver": "^7.0.1"
   }
 }

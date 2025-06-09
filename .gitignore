@@ -4,6 +4,7 @@ node_modules/
 # Ignore build artifacts
 dist/
 dev-build/
+release/
 
 # Ignore logs
 *.log
