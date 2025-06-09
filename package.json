@@ -29,7 +29,6 @@
     "@parcel/config-webextension": "^2.14.4",
     "parcel": "^2.14.4",
     "rimraf": "^6.0.1",
-    "svgo": "^3.3.2",
     "fs-extra": "^11.2.0",
     "archiver": "^7.0.1"
   }
