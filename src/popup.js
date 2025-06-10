@@ -17,8 +17,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importOpenFileInput = document.getElementById('import-open-file-input');
 
     const SAVED_TABS_KEY = 'savedTabs';
+    const { log } = await import('./utils/logger.js'); // Import the logger
 
-    chrome.runtime.onMessage.addListener((message) => {
+    function isFirefox() {
+        return typeof browser !== "undefined" && 
+               browser.runtime && 
+               (browser.runtime.getURL("").startsWith("moz-extension://") ||
+                navigator.userAgent.includes("Firefox"));
+    }
+
+    browser.runtime.onMessage.addListener((message) => {
         if (message.action === "refreshUI") {
             refreshLists();
         }
@@ -27,26 +35,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (new URLSearchParams(window.location.search).get('mode') === 'fullscreen') {
         document.body.classList.add('fullscreen-mode');
         document.title = 'Tab Options - Full Screen View';
+        log.info('Fullscreen mode activated.');
     }
 
     const popupHTML = new URL('./popup.html', import.meta.url).pathname;
-    document.getElementById('fullscreen-link')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const tabs = await chrome.tabs.query({});
+    
+    async function openFullscreenView(additionalParams = '') {
+        const tabs = await browser.tabs.query({});
         const fullscreenTab = tabs.find(tab =>
-            tab.url?.includes(chrome.runtime.getURL('')) &&
+            tab.url?.includes(browser.runtime.getURL('')) &&
             tab.url?.includes('mode=fullscreen&name=tab-options')
         );
 
         if (fullscreenTab) {
-            await chrome.tabs.update(fullscreenTab.id, { active: true });
-            await chrome.windows.update(fullscreenTab.windowId, { focused: true });
+            if (additionalParams) {
+                // If additional params provided, update the URL to include them
+                const newUrl = browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options" + additionalParams);
+                await browser.tabs.update(fullscreenTab.id, { url: newUrl, active: true });
+            } else {
+                // If no additional params, just activate the existing tab
+                await browser.tabs.update(fullscreenTab.id, { active: true });
+            }
+            await browser.windows.update(fullscreenTab.windowId, { focused: true });
         } else {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options"),
+            browser.tabs.create({
+                url: browser.runtime.getURL(popupHTML + "?mode=fullscreen&name=tab-options" + additionalParams),
                 active: true,
             });
         }
+    }
+
+    document.getElementById('fullscreen-link')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await openFullscreenView();
         window.close();
     });
 
@@ -96,10 +117,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tabId = parseInt(listItem.dataset.tabId);
             if (!isNaN(tabId)) {
                 try {
-                    const { windowId } = await chrome.tabs.update(tabId, { active: true });
-                    await chrome.windows.update(windowId, { focused: true });
+                    const { windowId } = await browser.tabs.update(tabId, { active: true });
+                    await browser.windows.update(windowId, { focused: true });
                 } catch (err) {
-                    console.error("Failed to activate tab/window:", err);
+                    log.error("Failed to activate tab/window:", err);
                 }
             }
         });
@@ -107,30 +128,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function getSavedTabs() {
-        const result = await chrome.storage.local.get(SAVED_TABS_KEY);
-        return result[SAVED_TABS_KEY] || [];
+        log.debug('Attempting to get saved tabs from storage.');
+        const result = await browser.storage.local.get(SAVED_TABS_KEY);
+        const savedTabs = result[SAVED_TABS_KEY] || [];
+        log.debug(`Retrieved ${savedTabs.length} saved tabs.`);
+        return savedTabs;
     }
 
     async function saveTabsToStorage(tabs) {
-        await chrome.storage.local.set({ [SAVED_TABS_KEY]: tabs });
+        log.debug(`Attempting to save ${tabs.length} tabs to storage.`);
+        await browser.storage.local.set({ [SAVED_TABS_KEY]: tabs });
+        log.info(`${tabs.length} tabs saved to storage.`);
     }
 
     async function addTabToSaved(tabInfo) {
+        log.debug(`Attempting to add tab to saved: ${tabInfo.url}`);
         const savedTabs = await getSavedTabs();
         if (!savedTabs.some(saved => saved.url === tabInfo.url)) {
             savedTabs.push({ title: tabInfo.title, url: tabInfo.url, favIconUrl: tabInfo.favIconUrl });
             await saveTabsToStorage(savedTabs);
+            log.info(`Tab added to saved: ${tabInfo.url}`);
+        } else {
+            log.debug(`Tab already saved, not adding: ${tabInfo.url}`);
         }
     }
 
     async function removeTabFromSaved(url) {
+        log.debug(`Attempting to remove tab from saved: ${url}`);
         let savedTabs = await getSavedTabs();
+        const initialCount = savedTabs.length;
         savedTabs = savedTabs.filter(tab => tab.url !== url);
-        await saveTabsToStorage(savedTabs);
+        if (savedTabs.length < initialCount) {
+            await saveTabsToStorage(savedTabs);
+            log.info(`Tab removed from saved: ${url}`);
+        } else {
+            log.debug(`Tab not found in saved, no removal: ${url}`);
+        }
     }
 
     async function clearSavedTabs() {
-        await chrome.storage.local.remove(SAVED_TABS_KEY);
+        log.info('Attempting to clear all saved tabs.');
+        await browser.storage.local.remove(SAVED_TABS_KEY);
+        log.info('All saved tabs cleared from storage.');
     }
 
     function escapeHTML(str) {
@@ -272,7 +311,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj/reviews" target="_blank" rel="noopener noreferrer">leaving a review</a>.
             <br>
             You can also find us on the 
-            <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>.
+            <a href="https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
+            or the
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/tab-options-open-source/" target="_blank" rel="noopener noreferrer">Firefox Add-ons Store</a>.
         </p>
     </div>
 </body>
@@ -280,22 +321,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function openTabsFromList(tabsToOpen, makeActive = false) {
+        log.info(`Attempting to open ${tabsToOpen.length} tabs from list.`);
         let openedCount = 0;
         for (const tab of tabsToOpen) {
             if (tab.url) { 
                 try {
-                    await chrome.tabs.create({ url: tab.url, active: makeActive }); 
+                    log.debug(`Creating tab for URL: ${tab.url}`);
+                    await browser.tabs.create({ url: tab.url, active: makeActive }); 
                     openedCount++;
                 } catch (tabError) {
-                    console.error(`Failed to open tab for URL ${tab.url}:`, tabError);
+                    log.error(`Failed to open tab for URL ${tab.url}:`, tabError);
                 }
+            } else {
+                log.warn('Skipping tab with no URL in openTabsFromList.', tab);
             }
         }
+        log.info(`Successfully opened ${openedCount} out of ${tabsToOpen.length} tabs.`);
         return openedCount;
     }
 
 
     async function refreshLists() {
+        log.debug('Refreshing UI lists.');
         duplicateTabsList.innerHTML = '';
         allTabsList.innerHTML = '';
         savedTabsList.innerHTML = '';
@@ -304,13 +351,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteAllSavedTabsButton.style.display = 'none'; 
 
         try {
-            const tabs = await chrome.tabs.query({});
+            const tabs = await browser.tabs.query({});
             const savedTabs = await getSavedTabs();
             const urlMap = new Map();
 
             updateAllTabsHeader(tabs.length);
             tabs.forEach(tab => {
-                if (!tab.url) return;
+                if (!tab.url) {
+                    log.debug('Skipping tab with no URL in refreshLists (allTabsList).', tab);
+                    return;
+                }
                 allTabsList.appendChild(createTabListItem(tab, [
                     { text: 'Save & Close', onClick: () => handleSaveAndClose(tab.id) },
                     { text: 'Close', onClick: () => handleCloseTab(tab.id) }
@@ -336,10 +386,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     closeAllButton.addEventListener('click', async () => {
                         const tabIdsToClose = tabsWithSameUrl.filter((_, index) => index !== 0).map(tab => tab.id);
                         try {
-                            await chrome.tabs.remove(tabIdsToClose);
+                            await browser.tabs.remove(tabIdsToClose);
                             refreshLists();
                         } catch (error) {
-                            console.error("Error closing duplicate tabs:", error);
+                            log.error("Error closing duplicate tabs:", error);
                             refreshLists();
                         }
                     });
@@ -354,13 +404,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             if (duplicateCount === 0) noDuplicatesMsg.style.display = 'block';
+            log.debug(`Found ${duplicateCount} groups of duplicate tabs.`);
 
             if (savedTabs.length === 0) {
                  noSavedTabsMsg.style.display = 'block';
                  deleteAllSavedTabsButton.style.display = 'none'; 
+                 log.debug('No saved tabs found.');
             } else {
                 noSavedTabsMsg.style.display = 'none';
                 deleteAllSavedTabsButton.style.display = 'inline-flex'; 
+                log.debug(`Displaying ${savedTabs.length} saved tabs.`);
                 savedTabs.forEach(savedTab => {
                     savedTabsList.appendChild(createTabListItem(savedTab, [
                         { text: 'Reopen', onClick: () => handleReopenTab(savedTab.url) },
@@ -369,125 +422,156 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
         } catch (error) {
-            console.error("Error refreshing lists:", error);
+            log.error("Error refreshing lists:", error);
             deleteAllSavedTabsButton.style.display = 'none'; 
         }
     }
 
     async function handleCloseTab(tabId) {
+        log.info(`Attempting to close tab: ${tabId}`);
         try {
-            await chrome.tabs.remove(tabId);
+            await browser.tabs.remove(tabId);
+            log.info(`Tab ${tabId} closed successfully.`);
             refreshLists();
         } catch (error) {
-            console.error(`Failed to close tab ${tabId}:`, error);
+            log.error(`Failed to close tab ${tabId}:`, error);
             refreshLists();
         }
     }
 
     async function handleSaveAndClose(tabId) {
+        log.info(`Attempting to save and close tab: ${tabId}`);
         try {
-            const tab = await chrome.tabs.get(tabId);
+            const tab = await browser.tabs.get(tabId);
             if (tab && tab.url) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
-                await chrome.tabs.remove(tabId);
+                await browser.tabs.remove(tabId);
+                log.info(`Tab ${tabId} saved and closed successfully.`);
                 refreshLists();
             } else {
-                 await chrome.tabs.remove(tabId);
+                 log.warn(`Tab ${tabId} has no URL or does not exist. Closing without saving.`);
+                 await browser.tabs.remove(tabId);
                  refreshLists();
             }
         } catch (error) {
-            console.error(`Failed to save and close tab ${tabId}:`, error);
+            log.error(`Failed to save and close tab ${tabId}:`, error);
             refreshLists();
         }
     }
 
     async function handleReopenTab(url) {
+        log.info(`Attempting to reopen tab from saved: ${url}`);
         try {
             await removeTabFromSaved(url);
-            await chrome.tabs.create({ url: url, active: true });
+            await browser.tabs.create({ url: url, active: true });
+            log.info(`Tab ${url} reopened successfully.`);
             refreshLists();
         } catch (error) {
-            console.error(`Failed to reopen tab for URL ${url}:`, error);
+            log.error(`Failed to reopen tab for URL ${url}:`, error);
         }
     }
 
     async function handleDeleteSavedTab(url) {
+        log.info(`Attempting to delete saved tab: ${url}`);
         try {
             await removeTabFromSaved(url);
+            log.info(`Saved tab ${url} deleted successfully.`);
             refreshLists();
         } catch (error)
         {
-            console.error(`Failed to delete saved tab for URL ${url}:`, error);
+            log.error(`Failed to delete saved tab for URL ${url}:`, error);
         }
     }
 
+    async function getCurrentTab() {
+        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        return tabs[0];
+    }
+    
+
     async function handleSaveAllAndClose() {
+        log.info('Attempting to save all and close tabs.');
         try {
-            const tabs = await chrome.tabs.query({});
+            const tabs = await browser.tabs.query({});
             const tabsToSave = tabs.filter(tab =>
                 tab.url &&
-                !tab.url.startsWith('chrome:') &&
-                !tab.url.startsWith('chrome-extension:') &&
-                 tab.id !== chrome.runtime.id
+                !tab.url.startsWith('chrome:') // Keep 'chrome:' for internal browser pages
+                && !tab.url.startsWith('chrome-extension:') // Keep 'chrome-extension:'
+                 && tab.id !== browser.runtime.id // chrome.runtime.id -> browser.runtime.id
             );
             for (const tab of tabsToSave) {
                 await addTabToSaved({ title: tab.title, url: tab.url, favIconUrl: tab.favIconUrl });
             }
+            log.debug(`${tabsToSave.length} tabs marked for saving.`);
             let tabIdsToClose = tabsToSave.map(tab => tab.id);
-            const currentTab = await chrome.tabs.getCurrent();
+            const currentTab = await getCurrentTab();
             if (currentTab && tabIdsToClose.includes(currentTab.id)) {
                 tabIdsToClose = tabIdsToClose.filter(id => id !== currentTab.id);
             }
             const fullscreenTab = tabs.find(tab =>
-                tab.url?.includes(chrome.runtime.getURL('')) &&
+                tab.url?.includes(browser.runtime.getURL('')) && // chrome.runtime.getURL -> browser.runtime.getURL
                 tab.url?.includes('mode=fullscreen&name=tab-options')
             );
             if (fullscreenTab && tabIdsToClose.includes(fullscreenTab.id)) {
                 tabIdsToClose = tabIdsToClose.filter(id => id !== fullscreenTab.id);
+                log.debug('Fullscreen tab excluded from closing.');
             }
-            if (tabIdsToClose.length > 0) await chrome.tabs.remove(tabIdsToClose);
+            if (tabIdsToClose.length > 0) {
+                await browser.tabs.remove(tabIdsToClose);
+                log.info(`${tabIdsToClose.length} tabs closed.`);
+            }
             refreshLists();
         } catch (error) {
-            console.error("Failed to save and close all tabs:", error);
+            log.error("Failed to save and close all tabs:", error);
         }
     }
 
     async function handleReopenAllTabs() {
+        log.info('Attempting to reopen all saved tabs.');
         try {
             const savedTabs = await getSavedTabs();
             if (savedTabs.length > 0) {
+                log.debug(`Found ${savedTabs.length} saved tabs to reopen.`);
                 await openTabsFromList(savedTabs);
                 await clearSavedTabs();
                 refreshLists();
             } else {
-                console.log("No saved tabs to reopen.");
+                log.info("No saved tabs to reopen.");
             }
         } catch (error) {
-            console.error("Failed to reopen all tabs:", error);
+            log.error("Failed to reopen all tabs:", error);
         }
     }
 
     async function handleDeleteAllSavedTabs() {
+        log.info('Attempting to delete all saved tabs.');
         const savedTabs = await getSavedTabs();
         if (savedTabs.length === 0) {
+            log.info("No saved tabs to delete.");
             alert("There are no saved tabs to delete.");
             return;
         }
         if (confirm("Are you sure you want to delete ALL saved tabs? This action cannot be undone.")) {
+            log.debug('User confirmed deletion of all saved tabs.');
             try {
                 await clearSavedTabs();
                 refreshLists();
                 alert("All saved tabs have been deleted.");
+                log.info("All saved tabs successfully deleted by user confirmation.");
             } catch (error) {
-                console.error("Failed to delete all saved tabs:", error);
+                log.error("Failed to delete all saved tabs:", error);
                 alert("An error occurred while trying to delete all saved tabs.");
             }
+        } else {
+            log.debug('User cancelled deletion of all saved tabs.');
         }
     }
 
     async function handleExportSavedTabs() {
+        log.info('Starting export of saved tabs to HTML.');
         const savedTabs = await getSavedTabs();
         const currentDate = new Date().toISOString().split('T')[0];
+        log.debug(`Found ${savedTabs.length} saved tabs for export.`);
 
         let tabListItemsHTML = '';
         savedTabs.forEach(tab => {
@@ -514,15 +598,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `tab_options_saved_tabs_export_${currentDate}.html`;
+        const fileName = `tab_options_saved_tabs_export_${currentDate}.html`;
+        a.download = fileName;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(downloadUrl);
+        log.info(`Saved tabs exported to ${fileName}.`);
     }
 
     async function handleExportOpenTabs() {
-        const openTabs = await chrome.tabs.query({
+        log.info('Starting export of open tabs to HTML.');
+        const openTabs = await browser.tabs.query({
             url: ["http://*/*", "https://*/*"]
         });
         const currentDate = new Date().toISOString().split('T')[0];
+        log.debug(`Found ${openTabs.length} open tabs for export.`);
 
         let tabListItemsHTML = '';
         openTabs.forEach(tab => {
@@ -549,41 +637,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `tab_options_open_tabs_export_${currentDate}.html`;
+        const fileName = `tab_options_open_tabs_export_${currentDate}.html`;
+        a.download = fileName;
         document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(downloadUrl);
+        log.info(`Open tabs exported to ${fileName}.`);
     }
 
-    function handleImportSavedTabsButtonClick() { importSavedFileInput.click(); }
+    async function handleFullscreenImport(type, fileInput) {
+        if (isFirefox() && !document.body.classList.contains('fullscreen-mode')) {
+            log.debug(`Firefox detected (not in fullscreen), opening in fullscreen tab.`);
+            await openFullscreenView(`&triggerImport=${type}`);
+            window.close(); // Close the small popup
+        } else {
+            log.debug(`Not Firefox or already in fullscreen, directly clicking file input for ${type}.`);
+            fileInput.click();
+        }
+    }
+
+    async function handleImportSavedTabsButtonClick() {
+        log.debug('Import saved tabs button clicked.');
+        // If it's Firefox AND we are NOT already in fullscreen mode
+        await handleFullscreenImport('saved', importSavedFileInput);
+    }
     async function handleImportSavedTabs(event) {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {
+            log.debug('No file selected for import to saved tabs.');
+            return;
+        }
+        log.info(`Starting import to saved tabs from file: ${file.name}`);
         const reader = new FileReader();
         reader.onload = async (e) => {
             const fileContent = e.target.result;
             let importedToSavedCount = 0;
+            log.debug('File content loaded for saved tabs import.');
 
             try {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(fileContent, 'text/html');
                 const importedTabObjects = [];
                 const links = doc.querySelectorAll('ul > li a.tab-title-link');
+                log.debug(`Found ${links.length} potential links in HTML for saved tabs import.`);
 
                 links.forEach(link => {
                     const url = link.href;
                     const title = link.textContent || url;
                     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
                         importedTabObjects.push({ url: url, title: title, favIconUrl: '' });
+                        log.debug(`Parsed tab for import: ${title} - ${url}`);
                     }
                 });
 
                 if (importedTabObjects.length > 0) {
                     const currentSavedTabs = await getSavedTabs();
                     let updatedSavedTabs = [...currentSavedTabs];
+                    log.debug(`Current saved tabs count: ${currentSavedTabs.length}. Parsed tabs for import: ${importedTabObjects.length}`);
 
                     importedTabObjects.forEach(newTab => {
                         if (!updatedSavedTabs.some(existingTab => existingTab.url === newTab.url)) {
                             updatedSavedTabs.push(newTab);
                             importedToSavedCount++;
+                            log.debug(`Adding new tab to saved list: ${newTab.url}`);
+                        } else {
+                            log.debug(`Tab already exists in saved list, skipping: ${newTab.url}`);
                         }
                     });
 
@@ -591,61 +707,86 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await saveTabsToStorage(updatedSavedTabs);
                         refreshLists();
                         alert(`${importedToSavedCount} tab(s) imported to your saved list.`);
+                        log.info(`${importedToSavedCount} tab(s) successfully imported to saved list.`);
                     } else {
                         alert("No new tabs found in the file to import (or they already exist in your saved list).");
+                        log.info("No new tabs found in the file to import to saved list.");
                     }
                 } else {
                     alert("No valid tabs found in the selected file's list.");
+                    log.warn("No valid tabs found in the selected HTML file for saved tabs import.");
                 }
 
             } catch (error) {
-                console.error("Error parsing imported file for saved tabs:", error);
+                log.error("Error parsing imported file for saved tabs:", error);
                 alert("Error importing to saved list. Please ensure the file is a valid exported HTML file.");
             } finally {
-                importSavedFileInput.value = '';
+                importSavedFileInput.value = ''; // Reset file input
             }
         };
-        reader.onerror = (e) => { console.error("Error reading file:", e); alert("Error reading the selected file."); importSavedFileInput.value = ''; };
+        reader.onerror = (e) => {
+            log.error("Error reading file for saved tabs import:", e);
+            alert("Error reading the selected file.");
+            importSavedFileInput.value = '';
+        };
         reader.readAsText(file);
     }
 
-    function handleImportOpenTabsButtonClick() { importOpenFileInput.click(); }
+    async function handleImportOpenTabsButtonClick() {
+        log.debug('Import open tabs button clicked.');
+        // If it's Firefox AND we are NOT already in fullscreen mode
+        await handleFullscreenImport('open', importOpenFileInput);
+    }
+
     async function handleImportOpenTabs(event) {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {
+            log.debug('No file selected for import and open tabs.');
+            return;
+        }
+        log.info(`Starting import and open tabs from file: ${file.name}`);
         const reader = new FileReader();
         reader.onload = async (e) => {
             const fileContent = e.target.result;
+            log.debug('File content loaded for open tabs import.');
             try {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(fileContent, 'text/html');
                 const tabsToOpenDirectly = [];
                 const links = doc.querySelectorAll('ul > li a.tab-title-link');
+                log.debug(`Found ${links.length} potential links in HTML for open tabs import.`);
 
                 links.forEach(link => {
                     const url = link.href;
                     const title = link.textContent || url;
                     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
                          tabsToOpenDirectly.push({url: url, title: title});
+                         log.debug(`Parsed tab for opening: ${title} - ${url}`);
                     }
                 });
 
                 if (tabsToOpenDirectly.length > 0) {
                     const openedCount = await openTabsFromList(tabsToOpenDirectly);
                     alert(`${openedCount} tab(s) imported and opened successfully.`);
+                    log.info(`${openedCount} tab(s) imported and opened successfully.`);
                     if (openedCount > 0) refreshLists();
                 } else {
                     alert("No valid tabs found in the selected file's list to open.");
+                    log.warn("No valid tabs found in the selected HTML file to open.");
                 }
 
             } catch (error) {
-                console.error("Error parsing imported file for opening tabs:", error);
+                log.error("Error parsing imported file for opening tabs:", error);
                 alert("Error importing and opening tabs. Please ensure the file is a valid exported HTML file.");
             } finally {
-                importOpenFileInput.value = '';
+                importOpenFileInput.value = ''; // Reset file input
             }
         };
-        reader.onerror = (e) => { console.error("Error reading file:", e); alert("Error reading the selected file."); importOpenFileInput.value = ''; };
+        reader.onerror = (e) => {
+            log.error("Error reading file for opening tabs import:", e);
+            alert("Error reading the selected file.");
+            importOpenFileInput.value = '';
+        };
         reader.readAsText(file);
     }
 
@@ -662,4 +803,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     importOpenFileInput.addEventListener('change', handleImportOpenTabs);
 
     refreshLists();
+    log.info('Popup initialized and lists refreshed.');
 });

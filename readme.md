@@ -2,8 +2,9 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/aghontpi/Tab-Options?style=for-the-badge)](../../releases)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/kafdoidjnnbjciplpkhhfjoefkpfbplj?color=4285F4&label=Chrome%20Web%20Store&logo=googlechrome&style=for-the-badge)](https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj)
+[![Mozilla Add-on](https://img.shields.io/amo/v/tab-options-open-source?color=ff7139&label=Firefox%20Add-ons&logo=firefoxbrowser&style=for-the-badge)](https://addons.mozilla.org/en-US/firefox/addon/tab-options-open-source/)
 
-A lightweight Chrome extension that keeps your browsing session under control: instantly spot and close duplicate tabs, save sessions for later, and export/import/share your work with a single click.
+A lightweight browser extension that keeps your browsing session under control: instantly spot and close duplicate tabs, save sessions for later, and export/import/share your work with a single click. Works on Chrome and Firefox.
 
 ---
 
@@ -22,10 +23,24 @@ A lightweight Chrome extension that keeps your browsing session under control: i
 
 ## Installation
 
+**For Chrome:**
+
 1. Visit the Chrome Web Store:  
    https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj
 2. Click **Add to Chrome** → **Add extension**.
 3. Pin the blue “TO” icon in your toolbar for quick access (optional).
+
+**For Firefox:**
+
+1. Visit Firefox Add-ons:  
+   https://addons.mozilla.org/en-US/firefox/addon/tab-options-open-source/
+   *Alternatively, for development/manual install:*
+     * Download the `.zip` or `.xpi` file from the [releases page](../../releases).
+     * Open Firefox, type `about:addons` in the address bar, and press Enter.
+     * Click the gear icon (Tools for all add-ons) and select "Install Add-on From File...".
+     * Select the downloaded file.
+2. Click **Add to Firefox** → **Add**.
+3. The “TO” icon will appear in your toolbar.
 
 ---
 
@@ -60,6 +75,8 @@ A lightweight Chrome extension that keeps your browsing session under control: i
 
 ### Export
 
+The export feature allows you to save your lists of open or saved tabs into a HTML file. This HTML file can then be used to import the tabs back into the extension on any machine, either adding them to your saved list or opening them directly. This makes it easy to back up, share, or transfer your tab sessions.
+
 <p align="center">
   <img src="src/demo/export.png" height="auto" alt="Export screen">
 </p>
@@ -83,15 +100,49 @@ Having dozens of identical tabs scattered across multiple windows and profile is
 
 ## Development
 
+To get started with development:
+
 ```bash
 git clone git@github.com:aghontpi/Tab-Options.git
 cd Tab-Options 
 pnpm install
-pnpm run dev
+pnpm run dev:chrome # For Chrome 
+pnpm run dev:firefox # For Firefox
 ```
 
-1. Open Chrome → `chrome://extensions` → Enable **Developer mode**.
-2. Click **Load unpacked** and select the `dev-build/` folder.
+**Chrome:**
+
+1.  Open Chrome → `chrome://extensions` → Enable **Developer mode**.
+2.  Click **Load unpacked** and select the `dev-build/chrome` folder.
+
+**Firefox:**
+
+1.  Open Firefox → `about:debugging#/runtime/this-firefox`.
+2.  Click **Load Temporary Add-on...**.
+3.  Navigate to the `dev-build/firefox` folder and select the `manifest.json` file.
+
+(or)
+
+Install with `web-ext`:
+
+Via `pnpm`:
+
+```bash
+pnpm install -g web-ext
+```
+
+Or via Brew:
+
+```bash
+brew install web-ext
+```
+
+Then run:
+
+```bash
+cd dev-build
+web-ext run
+```
 
 ## Project Status
 
@@ -107,3 +158,4 @@ Apache License 2.0 - https://github.com/aghontpi/Tab-Options/blob/main/LICENSE
 
 • File an issue → GitHub Issues tab  
 • Rate on the [Chrome Web Store](https://chromewebstore.google.com/detail/tab-options/kafdoidjnnbjciplpkhhfjoefkpfbplj)
+• Rate on [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/tab-options-open-source/reviews/)
