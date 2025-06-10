@@ -76,7 +76,7 @@ A lightweight browser extension that keeps your browsing session under control: 
 ### Export
 
 <p align="center">
-  <img src="src/demo/export.png" height="300" alt="Export screen">
+  <img src="src/demo/export.png" height="auto" alt="Export screen">
 </p>
 
 ---
