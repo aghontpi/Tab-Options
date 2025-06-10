@@ -75,6 +75,8 @@ A lightweight browser extension that keeps your browsing session under control: 
 
 ### Export
 
+The export feature allows you to save your lists of open or saved tabs into a HTML file. This HTML file can then be used to import the tabs back into the extension on any machine, either adding them to your saved list or opening them directly. This makes it easy to back up, share, or transfer your tab sessions.
+
 <p align="center">
   <img src="src/demo/export.png" height="auto" alt="Export screen">
 </p>
