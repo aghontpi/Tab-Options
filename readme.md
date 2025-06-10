@@ -104,21 +104,20 @@ To get started with development:
 git clone git@github.com:aghontpi/Tab-Options.git
 cd tab-options
 pnpm install
-pnpm run dev # For Chrome development
-# For Firefox, you might need a separate build or adjust parcel config, 
-# or load the dev-build/manifest.json directly in Firefox after `pnpm run dev`
+pnpm run dev:chrome # For Chrome 
+pnpm run dev:firefox # For Firefox
 ```
 
 **Chrome:**
 
 1.  Open Chrome → `chrome://extensions` → Enable **Developer mode**.
-2.  Click **Load unpacked** and select the `dev-build/` folder.
+2.  Click **Load unpacked** and select the `dev-build/chrome` folder.
 
 **Firefox:**
 
 1.  Open Firefox → `about:debugging#/runtime/this-firefox`.
 2.  Click **Load Temporary Add-on...**.
-3.  Navigate to the `dev-build/` folder and select the `manifest.json` file.
+3.  Navigate to the `dev-build/firefox` folder and select the `manifest.json` file.
 
 (or)
 
