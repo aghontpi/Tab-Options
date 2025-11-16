@@ -3,6 +3,10 @@ import HeaderComponent from '../../components/header/header.component.js';
 import TabListComponent from '../../components/tabList/tabList.component.js';
 import { useTabManager } from '../../hooks/useTabManager.hook.js';
 import { openFullscreenView } from '../../utils/fullscreen.util.js';
+import {
+  importToSavedTabs,
+  importAndOpenTabs,
+} from '../../utils/import.util.js';
 import './popup.style.css';
 
 const PopupPage = () => {
@@ -60,6 +64,18 @@ const PopupPage = () => {
     await handleFullscreenImport('open', importOpenFileInputRef.current);
   }
 
+  async function handleImportSavedFile(event) {
+    const file = event.target.files[0];
+    await importToSavedTabs(file);
+    event.target.value = '';
+  }
+
+  async function handleImportOpenFile(event) {
+    const file = event.target.files[0];
+    await importAndOpenTabs(file);
+    event.target.value = '';
+  }
+
   return (
     <div>
       <HeaderComponent />
@@ -87,6 +103,7 @@ const PopupPage = () => {
         className="hidden-file-input"
         accept=".html"
         ref={importSavedFileInputRef}
+        onChange={handleImportSavedFile}
       />
       <input
         type="file"
@@ -94,6 +111,7 @@ const PopupPage = () => {
         className="hidden-file-input"
         accept=".html"
         ref={importOpenFileInputRef}
+        onChange={handleImportOpenFile}
       />
     </div>
   );

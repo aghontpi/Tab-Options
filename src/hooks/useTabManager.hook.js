@@ -8,7 +8,7 @@ import {
 } from '../utils/storage.util.js';
 import { openTabsFromList, getCurrentTab } from '../utils/tabs.util.js';
 import { generateExportHTML } from '../utils/export.util.js';
-import { downloadHTML } from '../utils/dom.util.js';
+import { downloadHTML, escapeHTML } from '../utils/dom.util.js';
 import { isFirefox } from '../utils/browser.util.js';
 import { openFullscreenView } from '../utils/fullscreen.util.js';
 
