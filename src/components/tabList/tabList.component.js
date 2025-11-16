@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   OpenTabsActions,
   SavedTabsActions,
 } from '../tabActions/tabActions.component.js';
 import TabListItemComponent from '../tabListItem/tabListItem.component.js';
-import './TabList.style.css';
+import './tabList.style.css';
 
 const TabListComponent = ({
   duplicateTabs,
@@ -21,7 +21,32 @@ const TabListComponent = ({
   onImportSavedTabs,
   onDeleteAllSavedTabs,
   onReopenAllTabs,
+  currentTab,
+  isFullscreenMode = false,
 }) => {
+  const activeTabRef = useRef(null);
+  const [highlightActive, setHighlightActive] = useState(false);
+
+  useEffect(() => {
+    // Only scroll and highlight in popup mode, not in fullscreen
+    if (activeTabRef.current && currentTab && !isFullscreenMode) {
+      activeTabRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+
+      // Trigger highlight after scroll completes
+      setTimeout(() => {
+        setHighlightActive(true);
+
+        // Remove highlight after 2 seconds
+        setTimeout(() => {
+          setHighlightActive(false);
+        }, 2000);
+      }, 300);
+    }
+  }, [currentTab, isFullscreenMode]);
+
   return (
     <>
       <h2>Duplicate Tabs</h2>
@@ -84,6 +109,9 @@ const TabListComponent = ({
             tab={tab}
             onCloseTab={onCloseTab}
             onSaveAndClose={onSaveAndClose}
+            ref={tab.id === currentTab?.id ? activeTabRef : null}
+            isActive={tab.id === currentTab?.id}
+            shouldHighlight={tab.id === currentTab?.id && highlightActive}
           />
         ))}
       </ul>

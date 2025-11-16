@@ -16,6 +16,7 @@ export const useTabManager = () => {
   const [duplicateTabs, setDuplicateTabs] = useState([]);
   const [allTabs, setAllTabs] = useState([]);
   const [savedTabs, setSavedTabs] = useState([]);
+  const [currentTab, setCurrentTab] = useState(null);
 
   const fetchAllTabData = useCallback(async () => {
     try {
@@ -42,6 +43,9 @@ export const useTabManager = () => {
 
       const storedSavedTabs = await getSavedTabs();
       setSavedTabs(storedSavedTabs);
+
+      const activeTab = await getCurrentTab();
+      setCurrentTab(activeTab);
 
       log.info('All tab data fetched and state updated.');
     } catch (error) {
@@ -336,5 +340,6 @@ export const useTabManager = () => {
     handleExportSavedTabs,
     handleExportOpenTabs,
     handleFullscreenImport,
+    currentTab,
   };
 };

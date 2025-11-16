@@ -20,15 +20,16 @@ const PopupPage = () => {
     handleExportSavedTabs,
     handleExportOpenTabs,
     handleFullscreenImport,
+    currentTab,
   } = useTabManager();
 
   const importSavedFileInputRef = useRef(null);
   const importOpenFileInputRef = useRef(null);
+  const isFullscreenMode =
+    new URLSearchParams(window.location.search).get('mode') === 'fullscreen';
 
   useEffect(() => {
-    if (
-      new URLSearchParams(window.location.search).get('mode') === 'fullscreen'
-    ) {
+    if (isFullscreenMode) {
       document.body.classList.add('fullscreen-mode');
       document.title = 'Tab Options - Full Screen View';
     }
@@ -77,6 +78,8 @@ const PopupPage = () => {
         onImportSavedTabs={handleImportSavedTabsButtonClick}
         onDeleteAllSavedTabs={handleDeleteAllSavedTabs}
         onReopenAllTabs={handleReopenAllTabs}
+        currentTab={currentTab}
+        isFullscreenMode={isFullscreenMode}
       />
       <input
         type="file"
