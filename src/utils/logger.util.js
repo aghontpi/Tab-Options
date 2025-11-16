@@ -3,12 +3,12 @@ export const LogLevel = {
   INFO: 1,
   WARN: 2,
   ERROR: 3,
-  NONE: 4, 
+  NONE: 4,
 };
 
 export const CURRENT_LOG_LEVEL = LogLevel.DEBUG;
 
-const PFX = "[TabOps]";
+const PFX = '[TabOps]';
 
 export const log = {
   debug: (message, ...optionalParams) => {

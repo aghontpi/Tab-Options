@@ -1,0 +1,99 @@
+import React, { useEffect, useRef } from 'react';
+import HeaderComponent from '../../components/header/header.component.js';
+import TabListComponent from '../../components/tabList/tabList.component.js';
+import { useTabManager } from '../../hooks/useTabManager.hook.js';
+import { openFullscreenView } from '../../utils/fullscreen.util.js';
+import './popup.style.css';
+
+const PopupPage = () => {
+  const {
+    duplicateTabs,
+    allTabs,
+    savedTabs,
+    handleCloseTab,
+    handleSaveAndClose,
+    handleReopenTab,
+    handleDeleteSavedTab,
+    handleSaveAllAndClose,
+    handleReopenAllTabs,
+    handleDeleteAllSavedTabs,
+    handleExportSavedTabs,
+    handleExportOpenTabs,
+    handleFullscreenImport,
+  } = useTabManager();
+
+  const importSavedFileInputRef = useRef(null);
+  const importOpenFileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      new URLSearchParams(window.location.search).get('mode') === 'fullscreen'
+    ) {
+      document.body.classList.add('fullscreen-mode');
+      document.title = 'Tab Options - Full Screen View';
+    }
+
+    const fullscreenLink = document.getElementById('fullscreen-link');
+    const handleClick = (e) => {
+      e.preventDefault();
+      openFullscreenView();
+    };
+
+    if (fullscreenLink) {
+      fullscreenLink.addEventListener('click', handleClick);
+    }
+
+    return () => {
+      document.body.classList.remove('fullscreen-mode');
+      if (fullscreenLink) {
+        fullscreenLink.removeEventListener('click', handleClick);
+      }
+    };
+  }, []);
+
+  async function handleImportSavedTabsButtonClick() {
+    await handleFullscreenImport('saved', importSavedFileInputRef.current);
+  }
+
+  async function handleImportOpenTabsButtonClick() {
+    await handleFullscreenImport('open', importOpenFileInputRef.current);
+  }
+
+  return (
+    <div>
+      <HeaderComponent />
+      <TabListComponent
+        duplicateTabs={duplicateTabs}
+        allTabs={allTabs}
+        savedTabs={savedTabs}
+        onCloseTab={handleCloseTab}
+        onSaveAndClose={handleSaveAndClose}
+        onReopenTab={handleReopenTab}
+        onDeleteSavedTab={handleDeleteSavedTab}
+        onExportOpenTabs={handleExportOpenTabs}
+        onImportOpenTabs={handleImportOpenTabsButtonClick}
+        onSaveAllAndClose={handleSaveAllAndClose}
+        onExportSavedTabs={handleExportSavedTabs}
+        onImportSavedTabs={handleImportSavedTabsButtonClick}
+        onDeleteAllSavedTabs={handleDeleteAllSavedTabs}
+        onReopenAllTabs={handleReopenAllTabs}
+      />
+      <input
+        type="file"
+        id="import-saved-file-input"
+        className="hidden-file-input"
+        accept=".html"
+        ref={importSavedFileInputRef}
+      />
+      <input
+        type="file"
+        id="import-open-file-input"
+        className="hidden-file-input"
+        accept=".html"
+        ref={importOpenFileInputRef}
+      />
+    </div>
+  );
+};
+
+export default PopupPage;

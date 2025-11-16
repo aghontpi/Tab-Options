@@ -1,0 +1,122 @@
+.header-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+
+.header-group .header-main-content {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.header-group h2 {
+  font-size: 1.1em;
+  color: #111;
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  width: var(--icon-button-size);
+  height: var(--icon-button-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  margin-left: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+.header-main-content > h2 + .icon-button {
+  margin-left: 8px;
+}
+
+.icon-button:hover {
+  background-color: #e0e0e0;
+}
+.icon-button img {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  display: block;
+}
+
+.icon-button .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 8px;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+.icon-button .tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+.icon-button:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+#export-open-tabs img,
+#export-saved-tabs img {
+  filter: invert(48%) sepia(90%) saturate(1270%) hue-rotate(95deg)
+    brightness(95%) contrast(88%);
+}
+#import-open-tabs img,
+#import-saved-tabs img {
+  filter: invert(49%) sepia(77%) saturate(1943%) hue-rotate(188deg)
+    brightness(101%) contrast(101%);
+}
+#delete-all-saved-tabs-btn img {
+  filter: invert(39%) sepia(76%) saturate(3517%) hue-rotate(344deg)
+    brightness(94%) contrast(90%);
+}
+
+#save-and-close-tabs,
+#reopen-all-tabs {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+  font-weight: bold;
+}
+#save-and-close-tabs:hover,
+#reopen-all-tabs:hover {
+  background-color: #2980b9;
+  border-color: #2471a3;
+}
+#save-and-close-tabs:active,
+#reopen-all-tabs:active {
+  background-color: #2471a3;
+  border-color: #1f618d;
+}

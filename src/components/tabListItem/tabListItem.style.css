@@ -1,0 +1,31 @@
+.tab-list-item {
+  cursor: pointer;
+}
+.tab-info {
+  flex-grow: 1;
+  margin: 0 10px;
+  overflow: hidden;
+}
+.tab-title {
+  font-weight: 500;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #222;
+}
+.tab-url {
+  color: #666;
+  font-size: 0.85em;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}

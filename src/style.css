@@ -3,15 +3,15 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: #ffffff;        /* dialog bg */
-  border: 1px solid #ccc;           /* thin grey outline */
+  background-color: #ffffff; /* dialog bg */
+  border: 1px solid #ccc; /* thin grey outline */
   border-radius: 5px;
   padding: 15px 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 999999;
   font-family: sans-serif;
   font-size: 14px;
-  color: #202124;                  /* body text */
+  color: #202124; /* body text */
   min-width: 250px;
   text-align: center;
 }
@@ -27,21 +27,21 @@
   cursor: pointer;
   font-size: 13px;
   transition: background-color 0.2s ease;
-  border: 1px solid #1a73e8;        /* Google‑blue outline for both buttons */
+  border: 1px solid #1a73e8; /* Google‑blue outline for both buttons */
 }
 
 /* ――― PRIMARY: Merge (Switch & Close) ――― */
 #duplicate-tab-merger-confirm button#dtm-merge-button {
-  background-color: #1a73e8;        /* blue fill */
+  background-color: #1a73e8; /* blue fill */
   color: #ffffff;
 }
 #duplicate-tab-merger-confirm button#dtm-merge-button:hover {
-  background-color: #1669d3;        /* darker on hover */
+  background-color: #1669d3; /* darker on hover */
 }
 
 /* ――― SECONDARY: Keep / Keep & Go Back ――― */
 #duplicate-tab-merger-confirm button#dtm-keep-button {
-  background-color: #e8f0fe;        /* subtle blue tint */
+  background-color: #e8f0fe; /* subtle blue tint */
   color: #1a73e8;
   margin-left: 10px;
 }
@@ -98,8 +98,8 @@
 
   /* PRIMARY */
   #duplicate-tab-merger-confirm button#dtm-merge-button {
-    background-color: #8ab4f8;   /* lighter blue */
-    color: #202124;              /* high‑contrast text */
+    background-color: #8ab4f8; /* lighter blue */
+    color: #202124; /* high‑contrast text */
   }
   #duplicate-tab-merger-confirm button#dtm-merge-button:hover {
     background-color: #7aa3f4;

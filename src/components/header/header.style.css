@@ -1,0 +1,24 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0 10px 0;
+}
+
+.header h1 {
+  margin: 0 4px 0 0;
+  font-size: 18px;
+  color: #333;
+}
+
+#fullscreen-link {
+  display: flex;
+  padding: 4px;
+  border-radius: 4px;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+#fullscreen-link:hover {
+  background-color: #eee;
+}
