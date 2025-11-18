@@ -17,6 +17,7 @@ const TabListComponent = ({
   onExportOpenTabs,
   onImportOpenTabs,
   onSaveAllAndClose,
+  onCloseDuplicates,
   onExportSavedTabs,
   onImportSavedTabs,
   onDeleteAllSavedTabs,
@@ -50,7 +51,30 @@ const TabListComponent = ({
 
   return (
     <>
-      <h2>Duplicate Tabs</h2>
+      <div className="header-group">
+        <div className="header-main-content">
+          <h2>Duplicate Tabs ({duplicateTabs.length})</h2>
+        </div>
+        {duplicateTabs.length > 0 && (
+          <button
+            id="close-all-duplicates-global"
+            onClick={() => {
+              const uniqueUrls = new Set();
+              const tabIdsToClose = [];
+              duplicateTabs.forEach((tab) => {
+                if (uniqueUrls.has(tab.url)) {
+                  tabIdsToClose.push(tab.id);
+                } else {
+                  uniqueUrls.add(tab.url);
+                }
+              });
+              onCloseAllDuplicates(tabIdsToClose);
+            }}
+          >
+            Close all duplicate
+          </button>
+        )}
+      </div>
       <div id="duplicate-section">
         {duplicateTabs.length === 0 ? (
           <p id="no-duplicates-msg">No duplicate tabs found.</p>
@@ -78,7 +102,7 @@ const TabListComponent = ({
                           onCloseAllDuplicates(tabIdsToClose);
                         }}
                       >
-                        Close All Duplicates
+                        Close Duplicates
                       </button>
                     </div>
                     {tabsWithSameUrl.map((tab) => (
@@ -101,6 +125,7 @@ const TabListComponent = ({
         onExportOpenTabs={onExportOpenTabs}
         onImportOpenTabs={onImportOpenTabs}
         onSaveAllAndClose={onSaveAllAndClose}
+        onCloseDuplicates={onCloseDuplicates}
         allTabsCount={allTabs.length}
       />
       <ul id="all-tabs-list">

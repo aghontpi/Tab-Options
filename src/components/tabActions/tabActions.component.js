@@ -8,6 +8,7 @@ export const OpenTabsActions = ({
   onExportOpenTabs,
   onImportOpenTabs,
   onSaveAllAndClose,
+  onCloseDuplicates,
   allTabsCount,
 }) => {
   return (
@@ -31,6 +32,15 @@ export const OpenTabsActions = ({
         >
           <img src={importArrowIcon} alt="Import & Open Tabs" />
           <span className="tooltip-text">Import & Open Tabs</span>
+        </button>
+        <button
+          id="close-duplicate-tabs"
+          className="icon-button"
+          title="Close Duplicate Tabs"
+          onClick={onCloseDuplicates}
+        >
+          <img src={trashIcon} alt="Close Duplicate Tabs" />
+          <span className="tooltip-text">Close Duplicate Tabs</span>
         </button>
       </div>
       <button id="save-and-close-tabs" onClick={onSaveAllAndClose}>

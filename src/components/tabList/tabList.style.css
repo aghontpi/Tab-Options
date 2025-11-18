@@ -80,3 +80,19 @@ li:hover {
   border-radius: 3px;
   margin-bottom: 15px;
 }
+
+#close-all-duplicates-global {
+  background-color: #e74c3c;
+  color: white;
+  border-color: #c0392b;
+  font-weight: bold;
+}
+
+#close-all-duplicates-global:hover {
+  background-color: #c0392b;
+  border-color: #a93226;
+}
+
+#close-all-duplicates-global:active {
+  background-color: #a93226;
+}

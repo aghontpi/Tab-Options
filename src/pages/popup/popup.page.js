@@ -82,6 +82,13 @@ const PopupPage = () => {
     await fetchAllTabData();
   }
 
+  const handleCloseDuplicateTabs = async () => {
+    const duplicateTabIdsToClose = duplicateTabs
+      .filter((tab) => tab.id !== currentTab.id)
+      .map((tab) => tab.id);
+    await handleCloseAllDuplicates(duplicateTabIdsToClose);
+  };
+
   return (
     <div>
       <HeaderComponent stats={duplicateTabStats} />
@@ -96,6 +103,7 @@ const PopupPage = () => {
         onExportOpenTabs={handleExportOpenTabs}
         onImportOpenTabs={handleImportOpenTabsButtonClick}
         onSaveAllAndClose={handleSaveAllAndClose}
+        onCloseDuplicates={handleCloseDuplicateTabs}
         onExportSavedTabs={handleExportSavedTabs}
         onImportSavedTabs={handleImportSavedTabsButtonClick}
         onDeleteAllSavedTabs={handleDeleteAllSavedTabs}
