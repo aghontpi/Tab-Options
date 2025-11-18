@@ -30,6 +30,7 @@ const PopupPage = () => {
     currentTab,
     fetchAllTabData,
     duplicateTabStats,
+    handleCloseAllOpenTabs,
   } = useTabManager();
 
   const importSavedFileInputRef = useRef(null);
@@ -104,6 +105,7 @@ const PopupPage = () => {
         onImportOpenTabs={handleImportOpenTabsButtonClick}
         onSaveAllAndClose={handleSaveAllAndClose}
         onCloseDuplicates={handleCloseDuplicateTabs}
+        onCloseAllOpenTabs={handleCloseAllOpenTabs}
         onExportSavedTabs={handleExportSavedTabs}
         onImportSavedTabs={handleImportSavedTabsButtonClick}
         onDeleteAllSavedTabs={handleDeleteAllSavedTabs}

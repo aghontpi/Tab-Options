@@ -23,6 +23,7 @@ const TabListComponent = ({
   onDeleteAllSavedTabs,
   onReopenAllTabs,
   onCloseAllDuplicates,
+  onCloseAllOpenTabs,
   currentTab,
   isFullscreenMode = false,
 }) => {
@@ -58,6 +59,7 @@ const TabListComponent = ({
         {duplicateTabs.length > 0 && (
           <button
             id="close-all-duplicates-global"
+            className="btn btn-danger"
             onClick={() => {
               const uniqueUrls = new Set();
               const tabIdsToClose = [];
@@ -75,7 +77,7 @@ const TabListComponent = ({
           </button>
         )}
       </div>
-      <div id="duplicate-section">
+      <div id="duplicate-section" className={duplicateTabs.length > 0 ? 'card' : ''}>
         {duplicateTabs.length === 0 ? (
           <p id="no-duplicates-msg">No duplicate tabs found.</p>
         ) : (
@@ -93,7 +95,7 @@ const TabListComponent = ({
                         Duplicates of: {url}
                       </span>
                       <button
-                        className="close-all-duplicates-button"
+                        className="close-all-duplicates-button btn btn-danger btn-sm"
                         title={`Close all ${tabsWithSameUrl.length - 1} tabs with URL: ${url}`}
                         onClick={() => {
                           const tabIdsToClose = tabsWithSameUrl
@@ -126,6 +128,7 @@ const TabListComponent = ({
         onImportOpenTabs={onImportOpenTabs}
         onSaveAllAndClose={onSaveAllAndClose}
         onCloseDuplicates={onCloseDuplicates}
+        onCloseAllOpenTabs={onCloseAllOpenTabs}
         allTabsCount={allTabs.length}
       />
       <ul id="all-tabs-list">

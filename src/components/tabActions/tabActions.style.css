@@ -1,13 +1,3 @@
-.header-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 4px;
-}
-
 .header-group .header-main-content {
   display: flex;
   align-items: center;
@@ -101,22 +91,4 @@
 #delete-all-saved-tabs-btn img {
   filter: invert(39%) sepia(76%) saturate(3517%) hue-rotate(344deg)
     brightness(94%) contrast(90%);
-}
-
-#save-and-close-tabs,
-#reopen-all-tabs {
-  background-color: #3498db;
-  color: white;
-  border-color: #2980b9;
-  font-weight: bold;
-}
-#save-and-close-tabs:hover,
-#reopen-all-tabs:hover {
-  background-color: #2980b9;
-  border-color: #2471a3;
-}
-#save-and-close-tabs:active,
-#reopen-all-tabs:active {
-  background-color: #2471a3;
-  border-color: #1f618d;
 }

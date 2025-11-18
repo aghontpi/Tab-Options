@@ -53,45 +53,51 @@ const TabListItemComponent = forwardRef(
           <span className="tab-title">{tab.title || '(No Title)'}</span>
           <span className="tab-url">{tab.url}</span>
         </span>
-        {isSaved ? (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onReopenTab(tab.url);
-              }}
-            >
-              Reopen
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteSavedTab(tab.url);
-              }}
-            >
-              Delete
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSaveAndClose(tab.id);
-              }}
-            >
-              Save & Close
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCloseTab(tab.id);
-              }}
-            >
-              Close
-            </button>
-          </>
-        )}
+        <div className="actions">
+          {isSaved ? (
+            <>
+              <button
+                className="action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReopenTab(tab.url);
+                }}
+              >
+                Reopen
+              </button>
+              <button
+                className="action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteSavedTab(tab.url);
+                }}
+              >
+                Delete
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSaveAndClose(tab.id);
+                }}
+              >
+                Save & Close
+              </button>
+              <button
+                className="action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCloseTab(tab.id);
+                }}
+              >
+                Close
+              </button>
+            </>
+          )}
+        </div>
       </li>
     );
   }

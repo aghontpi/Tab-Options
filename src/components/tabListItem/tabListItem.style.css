@@ -1,44 +1,73 @@
 .tab-list-item {
   cursor: pointer;
+  position: relative;
 }
+
 .tab-info {
   flex-grow: 1;
   margin: 0 10px;
   overflow: hidden;
 }
+
 .tab-title {
   font-weight: 500;
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #222;
+  color: var(--text-color);
+  font-size: 13px;
 }
+
 .tab-url {
-  color: #666;
-  font-size: 0.85em;
+  color: var(--text-muted);
+  font-size: 11px;
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
+
 .icon {
   width: 16px;
   height: 16px;
-  margin-right: 8px;
+  margin-right: 0;
   vertical-align: middle;
   flex-shrink: 0;
 }
 
-.tab-list-item.active {
-  position: relative;
+.actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.tab-list-item:hover .actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background-color: #eee;
+  color: var(--text-color);
 }
 
 .tab-list-item.active .icon {
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
   padding: 2px;
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: rgba(52, 152, 219, 0.1);
 }
 
 .tab-list-item.highlight {
@@ -48,18 +77,18 @@
 @keyframes highlight-pulse {
   0% {
     background-color: transparent;
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
   }
   10% {
-    background-color: rgba(59, 130, 246, 0.15);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+    background-color: rgba(52, 152, 219, 0.15);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
   }
   50% {
-    background-color: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    background-color: rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
   }
   100% {
     background-color: transparent;
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
   }
 }

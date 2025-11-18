@@ -8,7 +8,7 @@ export const OpenTabsActions = ({
   onExportOpenTabs,
   onImportOpenTabs,
   onSaveAllAndClose,
-  onCloseDuplicates,
+  onCloseAllOpenTabs,
   allTabsCount,
 }) => {
   return (
@@ -34,16 +34,20 @@ export const OpenTabsActions = ({
           <span className="tooltip-text">Import & Open Tabs</span>
         </button>
         <button
-          id="close-duplicate-tabs"
+          id="delete-all-open-tabs"
           className="icon-button"
-          title="Close Duplicate Tabs"
-          onClick={onCloseDuplicates}
+          title="Delete All Open Tabs"
+          onClick={onCloseAllOpenTabs}
         >
-          <img src={trashIcon} alt="Close Duplicate Tabs" />
-          <span className="tooltip-text">Close Duplicate Tabs</span>
+          <img src={trashIcon} alt="Delete All Open Tabs" />
+          <span className="tooltip-text">Delete All Open Tabs</span>
         </button>
       </div>
-      <button id="save-and-close-tabs" onClick={onSaveAllAndClose}>
+      <button
+        id="save-and-close-tabs"
+        className="btn btn-primary"
+        onClick={onSaveAllAndClose}
+      >
         Save all tabs & close
       </button>
     </div>
@@ -88,7 +92,11 @@ export const SavedTabsActions = ({
           <span className="tooltip-text">Delete All Saved Tabs</span>
         </button>
       </div>
-      <button id="reopen-all-tabs" onClick={onReopenAllTabs}>
+      <button
+        id="reopen-all-tabs"
+        className="btn btn-primary"
+        onClick={onReopenAllTabs}
+      >
         Reopen all tabs
       </button>
     </div>

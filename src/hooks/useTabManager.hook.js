@@ -216,6 +216,53 @@ export const useTabManager = () => {
     }
   };
 
+  const handleCloseAllOpenTabs = async () => {
+    log.info('Attempting to close all open tabs.');
+    try {
+      const tabs = await browser.tabs.query({});
+      let tabIdsToClose = tabs.map((tab) => tab.id);
+
+      // Exclude current tab (extension popup/page)
+      const currentTab = await getCurrentTab();
+      if (currentTab && tabIdsToClose.includes(currentTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== currentTab.id);
+      }
+
+      // Exclude fullscreen view if open
+      const fullscreenTab = tabs.find(
+        (tab) =>
+          tab.url?.includes(browser.runtime.getURL('')) &&
+          tab.url?.includes('mode=fullscreen&name=tab-options')
+      );
+      if (fullscreenTab && tabIdsToClose.includes(fullscreenTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== fullscreenTab.id);
+        log.debug('Fullscreen tab excluded from closing.');
+      }
+
+      if (tabIdsToClose.length > 0) {
+        // Update stats for any duplicates being closed
+        const duplicateTabIds = duplicateTabs.map((t) => t.id);
+        const closedDuplicateTabs = tabIdsToClose.filter((id) =>
+          duplicateTabIds.includes(id)
+        );
+        if (closedDuplicateTabs.length > 0) {
+          const stats = await getDuplicateTabStats();
+          await updateDuplicateTabStats({
+            closed: stats.closed + closedDuplicateTabs.length,
+          });
+        }
+
+        await browser.tabs.remove(tabIdsToClose);
+        log.info(`${tabIdsToClose.length} tabs closed.`);
+      } else {
+        log.info('No tabs to close.');
+      }
+      fetchAllTabData();
+    } catch (error) {
+      log.error('Failed to close all open tabs:', error);
+    }
+  };
+
   const handleReopenAllTabs = async () => {
     log.info('Attempting to reopen all saved tabs.');
     try {
@@ -378,6 +425,7 @@ export const useTabManager = () => {
     handleDeleteSavedTab,
     handleCloseAllDuplicates,
     handleSaveAllAndClose,
+    handleCloseAllOpenTabs,
     handleReopenAllTabs,
     handleDeleteAllSavedTabs,
     handleExportSavedTabs,
