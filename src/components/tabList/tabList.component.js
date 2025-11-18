@@ -21,6 +21,7 @@ const TabListComponent = ({
   onImportSavedTabs,
   onDeleteAllSavedTabs,
   onReopenAllTabs,
+  onCloseAllDuplicates,
   currentTab,
   isFullscreenMode = false,
 }) => {
@@ -74,7 +75,7 @@ const TabListComponent = ({
                           const tabIdsToClose = tabsWithSameUrl
                             .filter((_, index) => index !== 0)
                             .map((tab) => tab.id);
-                          browser.tabs.remove(tabIdsToClose);
+                          onCloseAllDuplicates(tabIdsToClose);
                         }}
                       >
                         Close All Duplicates

@@ -30,7 +30,6 @@
   flex-shrink: 0;
 }
 
-/* Active tab highlight animation */
 .tab-list-item.active {
   position: relative;
 }

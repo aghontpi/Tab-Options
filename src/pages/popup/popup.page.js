@@ -26,8 +26,10 @@ const PopupPage = () => {
     handleExportSavedTabs,
     handleExportOpenTabs,
     handleFullscreenImport,
+    handleCloseAllDuplicates,
     currentTab,
     fetchAllTabData,
+    duplicateTabStats,
   } = useTabManager();
 
   const importSavedFileInputRef = useRef(null);
@@ -41,20 +43,19 @@ const PopupPage = () => {
       document.title = 'Tab Options - Full Screen View';
     }
 
-    const fullscreenLink = document.getElementById('fullscreen-link');
-    const handleClick = (e) => {
-      e.preventDefault();
+    const fullscreenButton = document.getElementById('fullscreen-link');
+    const handleClick = () => {
       openFullscreenView();
     };
 
-    if (fullscreenLink) {
-      fullscreenLink.addEventListener('click', handleClick);
+    if (fullscreenButton) {
+      fullscreenButton.addEventListener('click', handleClick);
     }
 
     return () => {
       document.body.classList.remove('fullscreen-mode');
-      if (fullscreenLink) {
-        fullscreenLink.removeEventListener('click', handleClick);
+      if (fullscreenButton) {
+        fullscreenButton.removeEventListener('click', handleClick);
       }
     };
   }, []);
@@ -83,7 +84,7 @@ const PopupPage = () => {
 
   return (
     <div>
-      <HeaderComponent />
+      <HeaderComponent stats={duplicateTabStats} />
       <TabListComponent
         duplicateTabs={duplicateTabs}
         allTabs={allTabs}
@@ -99,6 +100,7 @@ const PopupPage = () => {
         onImportSavedTabs={handleImportSavedTabsButtonClick}
         onDeleteAllSavedTabs={handleDeleteAllSavedTabs}
         onReopenAllTabs={handleReopenAllTabs}
+        onCloseAllDuplicates={handleCloseAllDuplicates}
         currentTab={currentTab}
         isFullscreenMode={isFullscreenMode}
       />

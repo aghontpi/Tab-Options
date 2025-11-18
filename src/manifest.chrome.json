@@ -23,7 +23,7 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' http://localhost:* 'sha256-uhDXqIca8+8LHsiFEHZ63hPgZ+afR5PQ9Tgby9pua1M='; object-src 'self'"
+    "extension_pages": "script-src 'self'"
   },
   "content_scripts": [
     {

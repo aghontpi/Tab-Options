@@ -5,6 +5,8 @@ import {
   addTabToSaved,
   removeTabFromSaved,
   clearSavedTabs,
+  getDuplicateTabStats,
+  updateDuplicateTabStats,
 } from '../utils/storage.util.js';
 import { openTabsFromList, getCurrentTab } from '../utils/tabs.util.js';
 import { generateExportHTML } from '../utils/export.util.js';
@@ -17,6 +19,10 @@ export const useTabManager = () => {
   const [allTabs, setAllTabs] = useState([]);
   const [savedTabs, setSavedTabs] = useState([]);
   const [currentTab, setCurrentTab] = useState(null);
+  const [duplicateTabStats, setDuplicateTabStats] = useState({
+    identified: 0,
+    closed: 0,
+  });
 
   const fetchAllTabData = useCallback(async () => {
     try {
@@ -34,12 +40,17 @@ export const useTabManager = () => {
       });
 
       const duplicates = [];
+      let duplicateGroups = 0;
       for (const [url, tabGroup] of urlMap.entries()) {
         if (tabGroup.length > 1) {
           duplicates.push(...tabGroup);
+          duplicateGroups++;
         }
       }
       setDuplicateTabs(duplicates);
+
+      const latestStats = await getDuplicateTabStats();
+      setDuplicateTabStats(latestStats);
 
       const storedSavedTabs = await getSavedTabs();
       setSavedTabs(storedSavedTabs);
@@ -73,11 +84,32 @@ export const useTabManager = () => {
   const handleCloseTab = async (tabId) => {
     log.info(`Attempting to close tab: ${tabId}`);
     try {
+      const tab = allTabs.find((t) => t.id === tabId);
+      if (tab && duplicateTabs.some((d) => d.id === tabId)) {
+        const stats = await getDuplicateTabStats();
+        await updateDuplicateTabStats({ closed: stats.closed + 1 });
+      }
       await browser.tabs.remove(tabId);
       log.info(`Tab ${tabId} closed successfully.`);
       fetchAllTabData();
     } catch (error) {
       log.error(`Failed to close tab ${tabId}:`, error);
+      fetchAllTabData();
+    }
+  };
+
+  const handleCloseAllDuplicates = async (tabIdsToClose) => {
+    log.info(`Attempting to close all duplicate tabs: ${tabIdsToClose}`);
+    try {
+      const stats = await getDuplicateTabStats();
+      await updateDuplicateTabStats({
+        closed: stats.closed + tabIdsToClose.length,
+      });
+      await browser.tabs.remove(tabIdsToClose);
+      log.info(`${tabIdsToClose.length} duplicate tabs closed successfully.`);
+      fetchAllTabData();
+    } catch (error) {
+      log.error('Failed to close all duplicate tabs:', error);
       fetchAllTabData();
     }
   };
@@ -151,6 +183,16 @@ export const useTabManager = () => {
       }
       log.debug(`${tabsToSave.length} tabs marked for saving.`);
       let tabIdsToClose = tabsToSave.map((tab) => tab.id);
+      const duplicateTabIds = duplicateTabs.map((t) => t.id);
+      const closedDuplicateTabs = tabIdsToClose.filter((id) =>
+        duplicateTabIds.includes(id)
+      );
+      if (closedDuplicateTabs.length > 0) {
+        const stats = await getDuplicateTabStats();
+        await updateDuplicateTabStats({
+          closed: stats.closed + closedDuplicateTabs.length,
+        });
+      }
       const currentTab = await getCurrentTab();
       if (currentTab && tabIdsToClose.includes(currentTab.id)) {
         tabIdsToClose = tabIdsToClose.filter((id) => id !== currentTab.id);
@@ -334,6 +376,7 @@ export const useTabManager = () => {
     handleSaveAndClose,
     handleReopenTab,
     handleDeleteSavedTab,
+    handleCloseAllDuplicates,
     handleSaveAllAndClose,
     handleReopenAllTabs,
     handleDeleteAllSavedTabs,
@@ -342,5 +385,6 @@ export const useTabManager = () => {
     handleFullscreenImport,
     currentTab,
     fetchAllTabData,
+    duplicateTabStats,
   };
 };

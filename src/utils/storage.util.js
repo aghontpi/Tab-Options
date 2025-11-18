@@ -50,3 +50,30 @@ export async function clearSavedTabs() {
   await browser.storage.local.remove(SAVED_TABS_KEY);
   log.info('All saved tabs cleared from storage.');
 }
+
+export const DUPLICATE_TABS_STATS_KEY = 'duplicateTabsStats';
+
+export async function getDuplicateTabStats() {
+  log.debug('Attempting to get duplicate tab stats from storage.');
+  const result = await browser.storage.local.get(DUPLICATE_TABS_STATS_KEY);
+  const stats = result[DUPLICATE_TABS_STATS_KEY] || {
+    identified: 0,
+    closed: 0,
+  };
+  log.debug(
+    `Retrieved duplicate tab stats: identified=${stats.identified}, closed=${stats.closed}`
+  );
+  return stats;
+}
+
+export async function updateDuplicateTabStats(newStats) {
+  log.debug('Attempting to update duplicate tab stats.');
+  const currentStats = await getDuplicateTabStats();
+  const updatedStats = { ...currentStats, ...newStats };
+  await browser.storage.local.set({
+    [DUPLICATE_TABS_STATS_KEY]: updatedStats,
+  });
+  log.info(
+    `Duplicate tab stats updated: identified=${updatedStats.identified}, closed=${updatedStats.closed}`
+  );
+}

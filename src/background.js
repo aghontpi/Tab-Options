@@ -1,6 +1,10 @@
 import './browser-polyfill.js';
 
 const { log } = require('./utils/logger.util.js');
+const {
+  getDuplicateTabStats,
+  updateDuplicateTabStats,
+} = require('./utils/storage.util.js');
 
 const promptingTabs = new Set();
 const newlyCreatedTabs = new Set();
@@ -94,6 +98,8 @@ async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
       log.info(
         `Duplicate detected: Tab ${tabId} (${url}) vs Tab ${existingTab.id}`
       );
+      const stats = await getDuplicateTabStats();
+      await updateDuplicateTabStats({ identified: stats.identified + 1 });
       promptingTabs.add(tabId);
 
       try {
@@ -234,6 +240,11 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       let mergeSuccess = false;
       try {
+        const stats = await getDuplicateTabStats();
+        await updateDuplicateTabStats({
+          closed: stats.closed + 1,
+        });
+
         await browser.tabs.update(message.existingTabId, { active: true });
 
         const existingTabDetails = await browser.tabs.get(
