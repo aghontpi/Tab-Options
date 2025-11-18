@@ -4,6 +4,7 @@ import {
   SavedTabsActions,
 } from '../tabActions/tabActions.component.js';
 import TabListItemComponent from '../tabListItem/tabListItem.component.js';
+import { groupTabsByDomain } from '../../utils/domain.util.js';
 import './tabList.style.css';
 
 const TabListComponent = ({
@@ -29,6 +30,7 @@ const TabListComponent = ({
 }) => {
   const activeTabRef = useRef(null);
   const [highlightActive, setHighlightActive] = useState(false);
+  const [isGroupedView, setIsGroupedView] = useState(false);
 
   useEffect(() => {
     // Only scroll and highlight in popup mode, not in fullscreen
@@ -130,20 +132,49 @@ const TabListComponent = ({
         onCloseDuplicates={onCloseDuplicates}
         onCloseAllOpenTabs={onCloseAllOpenTabs}
         allTabsCount={allTabs.length}
+        isGroupedView={isGroupedView}
+        onToggleView={() => setIsGroupedView(!isGroupedView)}
       />
-      <ul id="all-tabs-list">
-        {allTabs.map((tab) => (
-          <TabListItemComponent
-            key={tab.id}
-            tab={tab}
-            onCloseTab={onCloseTab}
-            onSaveAndClose={onSaveAndClose}
-            ref={tab.id === currentTab?.id ? activeTabRef : null}
-            isActive={tab.id === currentTab?.id}
-            shouldHighlight={tab.id === currentTab?.id && highlightActive}
-          />
-        ))}
-      </ul>
+      {isGroupedView ? (
+        <div id="grouped-tabs-list">
+          {Object.entries(groupTabsByDomain(allTabs)).map(([domain, tabs]) => (
+            <React.Fragment key={domain}>
+              <div className="group-header">
+                <span className="group-url" title={domain}>
+                  {domain} ({tabs.length})
+                </span>
+              </div>
+              <ul>
+                {tabs.map((tab) => (
+                  <TabListItemComponent
+                    key={tab.id}
+                    tab={tab}
+                    onCloseTab={onCloseTab}
+                    onSaveAndClose={onSaveAndClose}
+                    ref={tab.id === currentTab?.id ? activeTabRef : null}
+                    isActive={tab.id === currentTab?.id}
+                    shouldHighlight={tab.id === currentTab?.id && highlightActive}
+                  />
+                ))}
+              </ul>
+            </React.Fragment>
+          ))}
+        </div>
+      ) : (
+        <ul id="all-tabs-list">
+          {allTabs.map((tab) => (
+            <TabListItemComponent
+              key={tab.id}
+              tab={tab}
+              onCloseTab={onCloseTab}
+              onSaveAndClose={onSaveAndClose}
+              ref={tab.id === currentTab?.id ? activeTabRef : null}
+              isActive={tab.id === currentTab?.id}
+              shouldHighlight={tab.id === currentTab?.id && highlightActive}
+            />
+          ))}
+        </ul>
+      )}
 
       <SavedTabsActions
         onExportSavedTabs={onExportSavedTabs}

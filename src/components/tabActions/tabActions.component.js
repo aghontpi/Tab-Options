@@ -2,6 +2,8 @@ import React from 'react';
 import exportArrowIcon from 'url:../../icons/export-arrow.svg';
 import importArrowIcon from 'url:../../icons/import-arrow.svg';
 import trashIcon from 'url:../../icons/trash.svg';
+import listIcon from 'url:../../icons/list.svg';
+import layersIcon from 'url:../../icons/layers.svg';
 import './TabActions.style.css';
 
 export const OpenTabsActions = ({
@@ -10,6 +12,8 @@ export const OpenTabsActions = ({
   onSaveAllAndClose,
   onCloseAllOpenTabs,
   allTabsCount,
+  isGroupedView,
+  onToggleView,
 }) => {
   return (
     <div className="header-group">
@@ -41,6 +45,20 @@ export const OpenTabsActions = ({
         >
           <img src={trashIcon} alt="Delete All Open Tabs" />
           <span className="tooltip-text">Delete All Open Tabs</span>
+        </button>
+        <button
+          id="toggle-view-btn"
+          className="icon-button"
+          onClick={onToggleView}
+          title={isGroupedView ? 'Switch to List View' : 'Group by Domain'}
+        >
+          <img
+            src={isGroupedView ? listIcon : layersIcon}
+            alt={isGroupedView ? 'List View' : 'Group by Domain'}
+          />
+          <span className="tooltip-text">
+            {isGroupedView ? 'List View' : 'Group by Domain'}
+          </span>
         </button>
       </div>
       <button
