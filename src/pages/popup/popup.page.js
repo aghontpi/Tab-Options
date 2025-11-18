@@ -7,9 +7,11 @@ import {
   importToSavedTabs,
   importAndOpenTabs,
 } from '../../utils/import.util.js';
+import packageJson from '../../../package.json';
 import './popup.style.css';
 
 const PopupPage = () => {
+  const extensionVersion = packageJson.version;
   const {
     duplicateTabs,
     allTabs,
@@ -25,6 +27,7 @@ const PopupPage = () => {
     handleExportOpenTabs,
     handleFullscreenImport,
     currentTab,
+    fetchAllTabData,
   } = useTabManager();
 
   const importSavedFileInputRef = useRef(null);
@@ -68,12 +71,14 @@ const PopupPage = () => {
     const file = event.target.files[0];
     await importToSavedTabs(file);
     event.target.value = '';
+    await fetchAllTabData();
   }
 
   async function handleImportOpenFile(event) {
     const file = event.target.files[0];
     await importAndOpenTabs(file);
     event.target.value = '';
+    await fetchAllTabData();
   }
 
   return (
@@ -113,6 +118,17 @@ const PopupPage = () => {
         ref={importOpenFileInputRef}
         onChange={handleImportOpenFile}
       />
+      <footer className="version-info">
+        <div>v{extensionVersion}</div>
+        <a
+          href="https://github.com/aghontpi/Tab-Options"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="GitHub Repository"
+        >
+          <span>Open in GitHub</span>
+        </a>
+      </footer>
     </div>
   );
 };

@@ -81,3 +81,25 @@ button:active {
 .hidden-file-input {
   display: none;
 }
+
+.version-info {
+  border-top: 1px solid #eee;
+  padding-top: 5px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.8em;
+  color: #aaa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.version-info a {
+  color: #aaa; /* Match the text color */
+  text-decoration: none; /* Remove underline */
+  margin-left: 5px;
+}
+
+.version-info a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}

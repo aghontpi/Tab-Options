@@ -35,6 +35,13 @@
   position: relative;
 }
 
+.tab-list-item.active .icon {
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  padding: 2px;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
 .tab-list-item.highlight {
   animation: highlight-pulse 2s ease-in-out;
 }

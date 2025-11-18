@@ -341,5 +341,6 @@ export const useTabManager = () => {
     handleExportOpenTabs,
     handleFullscreenImport,
     currentTab,
+    fetchAllTabData,
   };
 };
