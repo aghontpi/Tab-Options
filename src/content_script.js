@@ -20,16 +20,20 @@ if (!window.duplicateTabMergerHasRun) {
     const dialog = document.createElement('div');
     dialog.id = 'duplicate-tab-merger-confirm';
 
+    const title = document.createElement('h3');
+    title.textContent = 'Duplicate Tab Detected';
+    dialog.appendChild(title);
+
     const message = document.createElement('p');
     message.textContent =
-      'Duplicate tab detected. An identical tab is already open.';
+      'An identical tab is already open in another window.';
     dialog.appendChild(message);
 
     const buttonArea = document.createElement('div');
-    buttonArea.style.marginTop = '10px';
+    buttonArea.className = 'dtm-button-area';
 
     const mergeButton = document.createElement('button');
-    mergeButton.textContent = 'Merge (Switch & Close)';
+    mergeButton.textContent = 'Switch & Close';
     mergeButton.id = 'dtm-merge-button';
     mergeButton.addEventListener('click', () => {
       browser.runtime.sendMessage({
@@ -44,9 +48,8 @@ if (!window.duplicateTabMergerHasRun) {
     const keepButton = document.createElement('button');
     keepButton.textContent = data.isNavigation
       ? 'Keep & Go Back'
-      : 'Keep This Tab';
+      : 'Keep Tab';
     keepButton.id = 'dtm-keep-button';
-    keepButton.style.marginLeft = '10px';
     keepButton.addEventListener('click', () => {
       browser.runtime.sendMessage({
         action: 'keepTab',
@@ -57,7 +60,7 @@ if (!window.duplicateTabMergerHasRun) {
     });
 
     const closeButton = document.createElement('button');
-    closeButton.textContent = '✕';
+    closeButton.textContent = '×';
     closeButton.id = 'dtm-close-button';
     closeButton.title = 'Close this prompt (keeps tab)';
     closeButton.addEventListener('click', () => {

@@ -3,64 +3,88 @@
   top: 20px;
   right: 20px;
   background-color: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 15px 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 999999;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 14px;
   color: #202124;
-  min-width: 250px;
-  text-align: center;
+  width: 320px;
+  text-align: left;
+  animation: dtm-fadeIn 0.3s ease-out;
+}
+
+@keyframes dtm-fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#duplicate-tab-merger-confirm h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
 }
 
 #duplicate-tab-merger-confirm p {
-  margin: 0 0 10px 0;
+  margin: 0 0 16px 0;
   padding: 0;
+  color: #666;
+  line-height: 1.4;
+}
+
+.dtm-button-area {
+  display: flex;
+  gap: 10px;
 }
 
 #duplicate-tab-merger-confirm button {
-  padding: 8px 15px;
-  border-radius: 3px;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 500;
   transition: background-color 0.2s ease;
-  border: 1px solid #1a73e8;
+  border: none;
+  flex: 1;
 }
 
 #duplicate-tab-merger-confirm button#dtm-merge-button {
-  background-color: #1a73e8;
+  background-color: #2563eb;
   color: #ffffff;
 }
 #duplicate-tab-merger-confirm button#dtm-merge-button:hover {
-  background-color: #1669d3;
+  background-color: #1d4ed8;
 }
 
 #duplicate-tab-merger-confirm button#dtm-keep-button {
-  background-color: #e8f0fe;
-  color: #1a73e8;
-  margin-left: 10px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
 }
 #duplicate-tab-merger-confirm button#dtm-keep-button:hover {
-  background-color: #d2e3fc;
+  background-color: #e5e7eb;
 }
 
 #duplicate-tab-merger-confirm button#dtm-close-button {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 12px;
+  right: 12px;
   background: none;
   border: none;
-  font-size: 16px;
-  font-weight: bold;
-  color: #5f6368;
-  padding: 2px 5px;
+  font-size: 18px;
+  color: #9ca3af;
+  padding: 4px;
   line-height: 1;
   cursor: pointer;
+  flex: none;
+  width: auto;
 }
 #duplicate-tab-merger-confirm button#dtm-close-button:hover {
-  color: #202124;
+  color: #4b5563;
+  background-color: transparent;
 }
 
 #duplicate-tab-redirect-message {
@@ -80,37 +104,40 @@
 
 @media (prefers-color-scheme: dark) {
   #duplicate-tab-merger-confirm {
-    background-color: #303134;
-    border-color: #5f6368;
-    color: #e8eaed;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    background-color: #1f2937;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   }
 
-  #duplicate-tab-merger-confirm button {
-    border-color: rgba(138, 180, 248, 0.6);
+  #duplicate-tab-merger-confirm h3 {
+    color: #f9fafb;
+  }
+
+  #duplicate-tab-merger-confirm p {
+    color: #d1d5db;
   }
 
   #duplicate-tab-merger-confirm button#dtm-merge-button {
-    background-color: #8ab4f8;
-    color: #202124;
+    background-color: #3b82f6;
+    color: #ffffff;
   }
   #duplicate-tab-merger-confirm button#dtm-merge-button:hover {
-    background-color: #7aa3f4;
+    background-color: #2563eb;
   }
 
   #duplicate-tab-merger-confirm button#dtm-keep-button {
-    background-color: transparent;
-    color: #8ab4f8;
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
   }
   #duplicate-tab-merger-confirm button#dtm-keep-button:hover {
-    background-color: rgba(138, 180, 248, 0.12);
+    background-color: #4b5563;
   }
 
   #duplicate-tab-merger-confirm button#dtm-close-button {
-    color: #9aa0a6;
+    color: #6b7280;
   }
   #duplicate-tab-merger-confirm button#dtm-close-button:hover {
-    color: #e8eaed;
+    color: #9ca3af;
   }
 
   #duplicate-tab-redirect-message {
