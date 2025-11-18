@@ -155,3 +155,10 @@ li:hover {
   box-shadow: var(--shadow);
   margin-bottom: 20px;
 }
+
+.fullscreen-mode #all-tabs-list,
+.fullscreen-mode #duplicate-tabs-list,
+.fullscreen-mode #saved-tabs-list {
+  max-height: none;
+  overflow-y: visible;
+}
