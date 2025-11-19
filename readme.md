@@ -15,13 +15,18 @@ A lightweight browser extension that keeps your browsing session under control: 
 | Duplicate-Tab Detection  | Real-time badge counter plus a toast asking whether to merge (switch & close) or keep both tabs.                                    |
 | All Tabs Panel           | Popup (and optional full-screen view) listing every open tab, with buttons to **Close**, **Save & Close**, or **Save all & Close**. |
 | Session Save / Restore   | One-click “Save” area. Restore/Sharing everything at once or reopen individual pages.                                               |
-| ️ Import, Export & Share  | Export your saved list to an HTML file; import it again on any machine.                                                             |
+| ️Import, Export & Share   | Export your saved list to an HTML file; import it again on any machine.                                                             |
 | Duplicate Tabs Summary   | Separate block at the top of the popup – see duplicates at a glance and close them in bulk.                                         |
-| Lightweight              | under 30kb                                                                                                                          |
+| Group by Domain          | Option to group open tabs by their domain for better organization.                                                                  |
+| Lightweight & Open source| -
+
+---
+
 
 ---
 
 ## Installation
+
 
 **For Chrome:**
 
@@ -48,17 +53,19 @@ A lightweight browser extension that keeps your browsing session under control: 
 
 1. Open a few webpages; duplicate one to see the badge counter turn red.
 2. Use:  
-   • **Merge (Switch & Close)** to jump to the original and close the copy.  
-   • **Keep & Go Back** if you really need two identical tabs.
+   • **Switch & Close** to jump to the original and close the copy.  
+   • **Keep Tab** if you intentionally want duplicates.
+   • **Go Back** to return to the previous page (if navigated).
 3. Click the toolbar icon.
-4. In the popup, hit **Save all tabs & close** to stash your current session.
-5. Later, press **Reopen all tabs** to bring everything back.
-6. Export & Import all sessions
+4. Use the **Close all duplicate** button in the popup to clean up multiple duplicates at once.
+5. In the popup, hit **Save all tabs & close** to stash your current session.
+6. Later, press **Reopen all tabs** to bring everything back.
+7. Export & Import all sessions
 
 ### Preview 1
 
 <p align="center">
-  <img src="src/demo/preview1.png" height="300" alt="Preview 1">
+  <img src="src/demo/preview1.png" height="auto" alt="Preview 1">
 </p>
 
 ### Preview 2
@@ -70,7 +77,7 @@ A lightweight browser extension that keeps your browsing session under control: 
 ### Preview 3
 
 <p align="center">
-  <img src="src/demo/preview3.png" height="300" alt="Preview 3">
+  <img src="src/demo/preview3.png" height="380" alt="Preview 3">
 </p>
 
 ### Export
@@ -83,14 +90,6 @@ The export feature allows you to save your lists of open or saved tabs into a HT
 
 ---
 
-## Options
-
-| Option                | Where              | Notes                                                                                              |
-| --------------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
-| Full-screen dashboard | Popup → ↗          | Expands the popup into its own tab for large sessions.                                             |
-| Export/Import/Share   | Popup bottom right | Creates a page, that can be shared with others; import merges with your existing open/ saved tabs. |
-
----
 
 ## Motivation
 
@@ -143,6 +142,31 @@ Then run:
 cd dev-build
 web-ext run
 ```
+
+## Built With
+
+- **[React](https://reactjs.org/)**: Used for building the user interface components.
+- **[Parcel](https://parceljs.org/)**: Web application bundler for building the extension.
+- **[Chrome Extension API](https://developer.chrome.com/docs/extensions/reference/)**: Core functionality for Chrome.
+- **[Firefox WebExtensions API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions)**: Core functionality for Firefox.
+
+---
+
+## Folder Structure
+
+- `src/`: Source code for the extension.
+  - `components/`: Reusable React components.
+  - `hooks/`: Custom React hooks.
+  - `pages/`: Full-page components.
+  - `popup/`: Entry point and components for the extension popup.
+  - `utils/`: Utility functions and helpers.
+  - `background.js`: Service worker for background tasks.
+  - `content_script.js`: Script injected into web pages.
+- `dev-build/`: Output directory for development builds.
+- `dist/`: Output directory for production builds.
+- `scripts/`: Helper scripts for building and packaging.
+
+---
 
 ## Project Status
 
