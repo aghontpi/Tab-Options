@@ -35,6 +35,7 @@ if (!window.duplicateTabMergerHasRun) {
     const mergeButton = document.createElement('button');
     mergeButton.textContent = 'Switch & Close';
     mergeButton.id = 'dtm-merge-button';
+    mergeButton.className = 'dtm-btn-primary';
     mergeButton.addEventListener('click', () => {
       browser.runtime.sendMessage({
         action: 'mergeTabs',
@@ -45,11 +46,27 @@ if (!window.duplicateTabMergerHasRun) {
       removeDialog();
     });
 
+    buttonArea.appendChild(mergeButton);
+
+    if (data.isNavigation) {
+      const goBackButton = document.createElement('button');
+      goBackButton.textContent = 'Go Back';
+      goBackButton.id = 'dtm-goback-button';
+      goBackButton.className = 'dtm-btn-secondary';
+      goBackButton.addEventListener('click', () => {
+        browser.runtime.sendMessage({
+          action: 'goBack',
+          currentTabId: messageData.currentTabId,
+        });
+        removeDialog();
+      });
+      buttonArea.appendChild(goBackButton);
+    }
+
     const keepButton = document.createElement('button');
-    keepButton.textContent = data.isNavigation
-      ? 'Keep & Go Back'
-      : 'Keep Tab';
+    keepButton.textContent = 'Keep Tab';
     keepButton.id = 'dtm-keep-button';
+    keepButton.className = 'dtm-btn-secondary';
     keepButton.addEventListener('click', () => {
       browser.runtime.sendMessage({
         action: 'keepTab',
@@ -58,6 +75,7 @@ if (!window.duplicateTabMergerHasRun) {
       });
       removeDialog();
     });
+    buttonArea.appendChild(keepButton);
 
     const closeButton = document.createElement('button');
     closeButton.textContent = '×';
@@ -72,10 +90,8 @@ if (!window.duplicateTabMergerHasRun) {
       removeDialog();
     });
 
-    buttonArea.appendChild(mergeButton);
-    buttonArea.appendChild(keepButton);
-    dialog.appendChild(buttonArea);
     dialog.insertBefore(closeButton, dialog.firstChild);
+    dialog.appendChild(buttonArea);
 
     document.body.appendChild(dialog);
     currentDialog = dialog;

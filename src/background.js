@@ -270,27 +270,30 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   } else if (
     message.action === 'keepTab' ||
-    message.action === 'promptClosed'
+    message.action === 'promptClosed' ||
+    message.action === 'goBack'
   ) {
     promptingTabs.delete(tabId);
 
     if (message.action === 'keepTab') {
       log.info(`User chose KEEP for Tab ${tabId}`);
+    } else if (message.action === 'goBack') {
+      log.info(`User chose GO BACK for Tab ${tabId}`);
     } else {
       log.info(
         `Confirmation prompt closed by user in Tab ${tabId}. Keeping tab.`
       );
     }
 
-    if (message.isNavigation && message.action === 'keepTab') {
-      log.info(`Tab ${tabId} resulted from navigation, attempting to go back.`);
+    if (message.action === 'goBack') {
+      log.info(`Tab ${tabId} navigating back.`);
       browser.scripting
         .executeScript({
           target: { tabId: tabId },
           func: () => {
             const msgDiv = document.createElement('div');
             msgDiv.id = 'duplicate-tab-redirect-message';
-            msgDiv.textContent = 'Redirecting back to prevent duplicate tab...';
+            msgDiv.textContent = 'Redirecting back...';
             msgDiv.style.position = 'fixed';
             msgDiv.style.bottom = '10px';
             msgDiv.style.left = '50%';
@@ -311,11 +314,11 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             `Failed to execute history.back() script in tab ${tabId}: ${err}`
           )
         );
-      sendResponse({ status: 'keep completed, navigating back' });
+      sendResponse({ status: 'navigating back' });
     } else {
+      // keepTab or promptClosed - just stay here
       sendResponse({
-        status:
-          message.action === 'keepTab' ? 'keep completed' : 'closed processed',
+        status: 'keep completed',
       });
       updateDuplicateCountBadge();
     }

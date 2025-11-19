@@ -5,6 +5,7 @@ import {
 } from '../tabActions/tabActions.component.js';
 import TabListItemComponent from '../tabListItem/tabListItem.component.js';
 import { groupTabsByDomain } from '../../utils/domain.util.js';
+import { SCROLL_TO_ACTIVE_TAB } from '../../config.js';
 import './tabList.style.css';
 
 const TabListComponent = ({
@@ -34,7 +35,12 @@ const TabListComponent = ({
 
   useEffect(() => {
     // Only scroll and highlight in popup mode, not in fullscreen
-    if (activeTabRef.current && currentTab && !isFullscreenMode) {
+    if (
+      activeTabRef.current &&
+      currentTab &&
+      !isFullscreenMode &&
+      SCROLL_TO_ACTIVE_TAB
+    ) {
       activeTabRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'center',

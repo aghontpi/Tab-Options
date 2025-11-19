@@ -11,7 +11,7 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 14px;
   color: #202124;
-  width: 320px;
+  width: 380px;
   text-align: left;
   animation: dtm-fadeIn 0.3s ease-out;
 }
@@ -49,22 +49,23 @@
   transition: background-color 0.2s ease;
   border: none;
   flex: 1;
+  min-width: fit-content;
 }
 
-#duplicate-tab-merger-confirm button#dtm-merge-button {
+#duplicate-tab-merger-confirm button.dtm-btn-primary {
   background-color: #2563eb;
   color: #ffffff;
 }
-#duplicate-tab-merger-confirm button#dtm-merge-button:hover {
+#duplicate-tab-merger-confirm button.dtm-btn-primary:hover {
   background-color: #1d4ed8;
 }
 
-#duplicate-tab-merger-confirm button#dtm-keep-button {
+#duplicate-tab-merger-confirm button.dtm-btn-secondary {
   background-color: #f3f4f6;
   color: #4b5563;
   border: 1px solid #e5e7eb;
 }
-#duplicate-tab-merger-confirm button#dtm-keep-button:hover {
+#duplicate-tab-merger-confirm button.dtm-btn-secondary:hover {
   background-color: #e5e7eb;
 }
 
@@ -116,20 +117,20 @@
     color: #d1d5db;
   }
 
-  #duplicate-tab-merger-confirm button#dtm-merge-button {
+  #duplicate-tab-merger-confirm button.dtm-btn-primary {
     background-color: #3b82f6;
     color: #ffffff;
   }
-  #duplicate-tab-merger-confirm button#dtm-merge-button:hover {
+  #duplicate-tab-merger-confirm button.dtm-btn-primary:hover {
     background-color: #2563eb;
   }
 
-  #duplicate-tab-merger-confirm button#dtm-keep-button {
+  #duplicate-tab-merger-confirm button.dtm-btn-secondary {
     background-color: #374151;
     color: #d1d5db;
     border-color: #4b5563;
   }
-  #duplicate-tab-merger-confirm button#dtm-keep-button:hover {
+  #duplicate-tab-merger-confirm button.dtm-btn-secondary:hover {
     background-color: #4b5563;
   }
 
