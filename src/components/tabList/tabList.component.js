@@ -85,7 +85,10 @@ const TabListComponent = ({
           </button>
         )}
       </div>
-      <div id="duplicate-section" className={duplicateTabs.length > 0 ? 'card' : ''}>
+      <div
+        id="duplicate-section"
+        className={duplicateTabs.length > 0 ? 'card' : ''}
+      >
         {duplicateTabs.length === 0 ? (
           <p id="no-duplicates-msg">No duplicate tabs found.</p>
         ) : (
@@ -159,7 +162,9 @@ const TabListComponent = ({
                     onSaveAndClose={onSaveAndClose}
                     ref={tab.id === currentTab?.id ? activeTabRef : null}
                     isActive={tab.id === currentTab?.id}
-                    shouldHighlight={tab.id === currentTab?.id && highlightActive}
+                    shouldHighlight={
+                      tab.id === currentTab?.id && highlightActive
+                    }
                   />
                 ))}
               </ul>

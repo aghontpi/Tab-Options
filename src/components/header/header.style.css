@@ -45,7 +45,7 @@
   width: 16px;
   height: 16px;
   display: block;
-  margin-right: 5px; 
+  margin-right: 5px;
 }
 
 .fullscreen-button span {
@@ -53,4 +53,3 @@
   font-weight: normal;
   color: #333;
 }
-

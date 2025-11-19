@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate Tab Dialog Mockups</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            gap: 60px;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .mockup-container {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .mockup-label {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        /* Backgrounds */
+        .bg-1 { background-image: url('https://images.unsplash.com/photo-1481487484168-9b995ecc168d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'); }
+        .bg-2 { background-image: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'); }
+        .bg-3 { background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'); }
+
+        /* Common Dialog Styles */
+        .dialog {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            width: 300px;
+            z-index: 10;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Design 1: Modern Minimal */
+        .d1 {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            font-family: 'Inter', sans-serif;
+            text-align: left;
+        }
+        .d1 h3 { margin: 0 0 8px 0; font-size: 16px; color: #111; }
+        .d1 p { margin: 0 0 16px 0; font-size: 14px; color: #666; line-height: 1.4; }
+        .d1-buttons { display: flex; gap: 10px; }
+        .d1-btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+        .d1-btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .d1-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Design 2: Dark & Bold */
+        .d2 {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            color: white;
+            text-align: center;
+        }
+        .d2-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+        .d2 p { margin: 0 0 15px 0; font-size: 15px; font-weight: 500; }
+        .d2-buttons { display: flex; flex-direction: column; gap: 8px; }
+        .d2-btn-primary {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        .d2-btn-secondary {
+            background: transparent;
+            color: #d1d5db;
+            border: 1px solid #4b5563;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Design 3: Glassmorphism */
+        .d3 {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            color: #1f2937;
+        }
+        .d3-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .d3-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .d3 p { margin: 0 0 16px 0; font-size: 14px; font-weight: 500; }
+        .d3-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+        .d3-btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            cursor: pointer;
+        }
+        .d3-btn-secondary {
+            background: rgba(255,255,255,0.5);
+            color: #4b5563;
+            border: 1px solid rgba(255,255,255,0.8);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Duplicate Tab Dialog Concepts</h1>
+
+    <div style="position: relative;">
+        <div class="mockup-label">Option 1: Modern Minimal</div>
+        <div class="mockup-container bg-1">
+            <div class="dialog d1">
+                <button class="d1-close">×</button>
+                <h3>Duplicate Tab Detected</h3>
+                <p>An identical tab is already open in another window.</p>
+                <div class="d1-buttons">
+                    <button class="d1-btn-primary">Switch & Close</button>
+                    <button class="d1-btn-secondary">Keep Tab</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: relative;">
+        <div class="mockup-label">Option 2: Dark & Bold</div>
+        <div class="mockup-container bg-2">
+            <div class="dialog d2">
+                <span class="d2-icon">⚠️</span>
+                <p>Duplicate Tab Detected</p>
+                <div class="d2-buttons">
+                    <button class="d2-btn-primary">Merge Tabs</button>
+                    <button class="d2-btn-secondary">Keep This Tab</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: relative;">
+        <div class="mockup-label">Option 3: Glassmorphism</div>
+        <div class="mockup-container bg-3">
+            <div class="dialog d3">
+                <div class="d3-header">
+                    <span class="d3-badge">ALERT</span>
+                </div>
+                <p>We found a duplicate tab. Would you like to merge them?</p>
+                <div class="d3-buttons">
+                    <button class="d3-btn-secondary">Keep</button>
+                    <button class="d3-btn-primary">Merge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

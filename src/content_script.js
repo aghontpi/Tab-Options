@@ -25,8 +25,7 @@ if (!window.duplicateTabMergerHasRun) {
     dialog.appendChild(title);
 
     const message = document.createElement('p');
-    message.textContent =
-      'An identical tab is already open in another window.';
+    message.textContent = 'An identical tab is already open in another window.';
     dialog.appendChild(message);
 
     const buttonArea = document.createElement('div');
