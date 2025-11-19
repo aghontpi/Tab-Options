@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Tab Options",
+  "name": "Tab Options - Open Source",
   "version": "1.5.0",
-  "description": "Manage your browsing session with ease: detect and merge duplicate tabs, group by domain, save sessions for later, and export/import your tabs. Lightweight and open source.",
+  "description": "Detect & merge duplicate tabs, group by domain, save sessions, export/import tabs. Lightweight & open source.",
   "permissions": ["tabs", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "background": {
