@@ -31,6 +31,8 @@ const PopupPage = () => {
     fetchAllTabData,
     duplicateTabStats,
     handleCloseAllOpenTabs,
+    handleCloseDomainTabs,
+    handleSaveAndCloseDomainTabs,
   } = useTabManager();
 
   const importSavedFileInputRef = useRef(null);
@@ -111,6 +113,8 @@ const PopupPage = () => {
         onDeleteAllSavedTabs={handleDeleteAllSavedTabs}
         onReopenAllTabs={handleReopenAllTabs}
         onCloseAllDuplicates={handleCloseAllDuplicates}
+        onCloseDomainTabs={handleCloseDomainTabs}
+        onSaveAndCloseDomainTabs={handleSaveAndCloseDomainTabs}
         currentTab={currentTab}
         isFullscreenMode={isFullscreenMode}
       />

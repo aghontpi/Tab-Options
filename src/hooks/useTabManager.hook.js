@@ -263,6 +263,105 @@ export const useTabManager = () => {
     }
   };
 
+  const handleCloseDomainTabs = async (tabIds) => {
+    log.info(`Attempting to close ${tabIds.length} domain tabs.`);
+    try {
+      let tabIdsToClose = [...tabIds];
+
+      const currentTab = await getCurrentTab();
+      if (currentTab && tabIdsToClose.includes(currentTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== currentTab.id);
+      }
+
+      const tabs = await browser.tabs.query({});
+      const fullscreenTab = tabs.find(
+        (tab) =>
+          tab.url?.includes(browser.runtime.getURL('')) &&
+          tab.url?.includes('mode=fullscreen&name=tab-options')
+      );
+      if (fullscreenTab && tabIdsToClose.includes(fullscreenTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== fullscreenTab.id);
+      }
+
+      if (tabIdsToClose.length > 0) {
+        const duplicateTabIds = duplicateTabs.map((t) => t.id);
+        const closedDuplicateTabs = tabIdsToClose.filter((id) =>
+          duplicateTabIds.includes(id)
+        );
+        if (closedDuplicateTabs.length > 0) {
+          const stats = await getDuplicateTabStats();
+          await updateDuplicateTabStats({
+            closed: stats.closed + closedDuplicateTabs.length,
+          });
+        }
+
+        await browser.tabs.remove(tabIdsToClose);
+        log.info(`${tabIdsToClose.length} domain tabs closed.`);
+      }
+      fetchAllTabData();
+    } catch (error) {
+      log.error('Failed to close domain tabs:', error);
+      fetchAllTabData();
+    }
+  };
+
+  const handleSaveAndCloseDomainTabs = async (tabIds) => {
+    log.info(`Attempting to save and close ${tabIds.length} domain tabs.`);
+    try {
+      const allTabs = await browser.tabs.query({});
+      const tabsToSave = allTabs.filter(
+        (tab) =>
+          tabIds.includes(tab.id) &&
+          tab.url &&
+          !tab.url.startsWith('chrome:') &&
+          !tab.url.startsWith('chrome-extension:')
+      );
+      for (const tab of tabsToSave) {
+        await addTabToSaved({
+          title: tab.title,
+          url: tab.url,
+          favIconUrl: tab.favIconUrl,
+        });
+      }
+
+      let tabIdsToClose = tabsToSave.map((tab) => tab.id);
+
+      const currentTab = await getCurrentTab();
+      if (currentTab && tabIdsToClose.includes(currentTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== currentTab.id);
+      }
+
+      const fullscreenTab = allTabs.find(
+        (tab) =>
+          tab.url?.includes(browser.runtime.getURL('')) &&
+          tab.url?.includes('mode=fullscreen&name=tab-options')
+      );
+      if (fullscreenTab && tabIdsToClose.includes(fullscreenTab.id)) {
+        tabIdsToClose = tabIdsToClose.filter((id) => id !== fullscreenTab.id);
+      }
+
+      const duplicateTabIds = duplicateTabs.map((t) => t.id);
+      const closedDuplicateTabs = tabIdsToClose.filter((id) =>
+        duplicateTabIds.includes(id)
+      );
+      if (closedDuplicateTabs.length > 0) {
+        const stats = await getDuplicateTabStats();
+        await updateDuplicateTabStats({
+          closed: stats.closed + closedDuplicateTabs.length,
+        });
+      }
+
+      if (tabIdsToClose.length > 0) {
+        await browser.tabs.remove(tabIdsToClose);
+        log.info(`${tabIdsToClose.length} domain tabs saved and closed.`);
+      }
+      fetchAllTabData();
+    } catch (error) {
+      log.error('Failed to save and close domain tabs:', error);
+      fetchAllTabData();
+    }
+  };
+
   const handleReopenAllTabs = async () => {
     log.info('Attempting to reopen all saved tabs.');
     try {
@@ -426,6 +525,8 @@ export const useTabManager = () => {
     handleCloseAllDuplicates,
     handleSaveAllAndClose,
     handleCloseAllOpenTabs,
+    handleCloseDomainTabs,
+    handleSaveAndCloseDomainTabs,
     handleReopenAllTabs,
     handleDeleteAllSavedTabs,
     handleExportSavedTabs,

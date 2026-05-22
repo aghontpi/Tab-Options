@@ -26,6 +26,8 @@ const TabListComponent = ({
   onReopenAllTabs,
   onCloseAllDuplicates,
   onCloseAllOpenTabs,
+  onCloseDomainTabs,
+  onSaveAndCloseDomainTabs,
   currentTab,
   isFullscreenMode = false,
 }) => {
@@ -152,6 +154,22 @@ const TabListComponent = ({
                 <span className="group-url" title={domain}>
                   {domain} ({tabs.length})
                 </span>
+                <button
+                  className="btn btn-primary btn-sm"
+                  title={`Save & close all ${tabs.length} tabs from ${domain}`}
+                  onClick={() =>
+                    onSaveAndCloseDomainTabs(tabs.map((t) => t.id))
+                  }
+                >
+                  Save & close all
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  title={`Close all ${tabs.length} tabs from ${domain}`}
+                  onClick={() => onCloseDomainTabs(tabs.map((t) => t.id))}
+                >
+                  Close all
+                </button>
               </div>
               <ul>
                 {tabs.map((tab) => (
