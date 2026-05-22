@@ -1,6 +1,6 @@
 {
   "name": "Tab-Options",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Detect & merge duplicate tabs, group by domain, save sessions, export/import tabs. Lightweight & open source.",
   "scripts": {
     "copy-manifest:chrome": "node scripts/copy-manifest.js chrome",
