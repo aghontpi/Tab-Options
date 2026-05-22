@@ -8,6 +8,28 @@ const {
 
 const promptingTabs = new Set();
 const newlyCreatedTabs = new Set();
+const keptTabs = new Map(); // Map<tabId, urlKey>
+
+function getTabKey(url) {
+  if (!url) return url;
+  try {
+    const urlObj = new URL(url);
+    if (
+      urlObj.hostname === 'mail.google.com' &&
+      urlObj.pathname.startsWith('/mail/u/')
+    ) {
+      // Extract account index: /mail/u/0/
+      const parts = urlObj.pathname.split('/');
+      // parts[0] is empty, parts[1] is 'mail', parts[2] is 'u', parts[3] is the account index
+      if (parts.length >= 4) {
+        return `https://${urlObj.hostname}/mail/u/${parts[3]}/`;
+      }
+    }
+    return url;
+  } catch (e) {
+    return url;
+  }
+}
 
 async function notifyPopupToRefresh() {
   try {
@@ -78,6 +100,13 @@ async function updateDuplicateCountBadge() {
 async function checkForDuplicateAndConfirm(tabId, url, isNavigation) {
   if (promptingTabs.has(tabId)) {
     log.info(`Tab ${tabId} is already being prompted.`);
+    return;
+  }
+
+  // Check if user previously chose to keep this tab for this URL (or key)
+  const currentKey = getTabKey(url);
+  if (keptTabs.has(tabId) && keptTabs.get(tabId) === currentKey) {
+    log.info(`Tab ${tabId} matches kept tab record (${currentKey}). Skipping prompt.`);
     return;
   }
 
@@ -211,6 +240,13 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (loadCompleted) {
         newlyCreatedTabs.delete(tabId);
       }
+
+      // If URL changed significantly (key changed), remove from keptTabs
+      const newKey = getTabKey(checkUrl);
+      if (keptTabs.has(tabId) && keptTabs.get(tabId) !== newKey) {
+        keptTabs.delete(tabId);
+      }
+
       checkForDuplicateAndConfirm(tabId, checkUrl, isNavigation);
     } else if (loadCompleted || urlChanged) {
       newlyCreatedTabs.delete(tabId);
@@ -285,6 +321,16 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       );
     }
 
+    if (message.action === 'keepTab' || message.action === 'promptClosed') {
+      // Remember this tab/url combination so we don't prompt again immediately
+      // We need to get the current URL of the tab to store it correctly
+      browser.tabs.get(tabId).then((tab) => {
+        if (tab && tab.url) {
+          keptTabs.set(tabId, getTabKey(tab.url));
+        }
+      });
+    }
+
     if (message.action === 'goBack') {
       log.info(`Tab ${tabId} navigating back.`);
       browser.scripting
@@ -332,6 +378,7 @@ browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
   log.info(`Tab removed: ${tabId}`);
   const wasPrompting = promptingTabs.delete(tabId);
   const wasNewlyCreated = newlyCreatedTabs.delete(tabId);
+  keptTabs.delete(tabId);
 
   if (wasPrompting) {
     log.info(`Tab ${tabId} closed while prompting.`);
