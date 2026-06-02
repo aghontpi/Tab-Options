@@ -322,13 +322,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.action === 'keepTab' || message.action === 'promptClosed') {
-      // Remember this tab/url combination so we don't prompt again immediately
-      // We need to get the current URL of the tab to store it correctly
-      browser.tabs.get(tabId).then((tab) => {
-        if (tab && tab.url) {
-          keptTabs.set(tabId, getTabKey(tab.url));
-        }
-      });
+      // Remember this tab/url combination so we don't prompt again on refresh
+      if (sender.tab && sender.tab.url) {
+        keptTabs.set(tabId, getTabKey(sender.tab.url));
+      }
     }
 
     if (message.action === 'goBack') {
